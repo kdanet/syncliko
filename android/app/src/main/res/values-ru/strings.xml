@@ -10,7 +10,7 @@
     <!-- Onboarding / pairing -->
     <string name="onb_tagline">Копируйте на телефоне, вставляйте на Mac — и обратно.</string>
     <string name="onb_step1">Откройте Syncliko в строке меню Mac</string>
-    <string name="onb_step2">Нажмите «Связать устройство…»</string>
+    <string name="onb_step2">Нажмите «Добавить устройство…»</string>
     <string name="onb_step3">Отсканируйте код этим телефоном</string>
     <string name="onb_scan">Сканировать QR-код</string>
     <string name="onb_paste">Вставить ссылку для связи</string>

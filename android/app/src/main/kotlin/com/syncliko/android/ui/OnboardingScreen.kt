@@ -11,6 +11,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,14 +23,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ContentPaste
 import androidx.compose.material.icons.rounded.ErrorOutline
 import androidx.compose.material.icons.rounded.LaptopMac
 import androidx.compose.material.icons.rounded.QrCodeScanner
@@ -50,10 +52,12 @@ import androidx.compose.runtime.setValue
 import com.syncliko.android.core.LocalNetwork
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -111,37 +115,47 @@ fun OnboardingScreen(controller: Controller) {
     // Side-by-side when there is room horizontally (unfolded) or little room vertically (landscape).
     val twoColumns = configuration.screenWidthDp >= 720 || (configuration.screenWidthDp >= 600 && configuration.screenHeightDp < 520)
 
-    Box(
-        Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface)
-            .safeDrawingPadding(),
-        contentAlignment = Alignment.Center,
-    ) {
-        AnimatedContent(
-            targetState = pairing,
-            contentKey = { it::class },
-            transitionSpec = { (fadeIn() + slideInVertically { it / 16 }) togetherWith fadeOut() },
-            label = "pairing",
-        ) { state ->
-            Box(
-                Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp),
-                contentAlignment = Alignment.Center,
-            ) {
-                when (state) {
-                    PairingState.Idle, is PairingState.Done -> Welcome(twoColumns, onScan = { withLocalNetwork(::scan) }, onPaste = { withLocalNetwork(::pasteLink) })
-                    PairingState.Connecting -> Progress(stringResource(R.string.pair_connecting), null, onCancel = controller::cancelPairing)
-                    is PairingState.AwaitingConfirmation -> Progress(
-                        stringResource(R.string.pair_confirm_title),
-                        stringResource(R.string.pair_confirm_body, state.macName),
-                        pulse = true,
-                        code = state.code,
-                        onCancel = controller::cancelPairing,
-                    )
-                    is PairingState.Failed -> Failure(state.reason, onRetry = controller::resetPairing)
+    // A Surface, not a plain background: it also sets the content color, so text without an explicit
+    // color is onSurface rather than the default black.
+    Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
+        Box(Modifier.fillMaxSize().safeDrawingPadding(), contentAlignment = Alignment.Center) {
+            AnimatedContent(
+                targetState = pairing,
+                contentKey = { it::class },
+                transitionSpec = { (fadeIn() + slideInVertically { it / 16 }) togetherWith fadeOut() },
+                label = "pairing",
+            ) { state ->
+                Box(
+                    Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    when (state) {
+                        PairingState.Idle, is PairingState.Done -> Welcome(twoColumns, onScan = { withLocalNetwork(::scan) }, onPaste = { withLocalNetwork(::pasteLink) })
+                        PairingState.Connecting -> Progress(stringResource(R.string.pair_connecting), null, onCancel = controller::cancelPairing)
+                        is PairingState.AwaitingConfirmation -> Progress(
+                            stringResource(R.string.pair_confirm_title),
+                            stringResource(R.string.pair_confirm_body, state.macName),
+                            pulse = true,
+                            code = state.code,
+                            onCancel = controller::cancelPairing,
+                        )
+                        is PairingState.Failed -> Failure(state.reason, onRetry = controller::resetPairing)
+                    }
                 }
             }
         }
+    }
+}
+
+/** The app icon itself: the S on the cobalt tile, cropped the way the launcher's adaptive-icon mask crops it
+ *  (the visible part is the middle 72 of the foreground's 108 units). */
+@Composable
+private fun BrandTile(size: Int = 112) {
+    Box(
+        Modifier.size(size.dp).clip(RoundedCornerShape(percent = 28)).background(Syncliko.colors.heroGradient),
+        contentAlignment = Alignment.Center,
+    ) {
+        Image(painterResource(R.drawable.ic_launcher_foreground), null, Modifier.requiredSize((size * 1.5f).dp))
     }
 }
 
@@ -183,7 +197,7 @@ private fun Welcome(twoColumns: Boolean, onScan: () -> Unit, onPaste: () -> Unit
 
 @Composable
 private fun Intro() {
-    Hero(Icons.Rounded.ContentPaste)
+    BrandTile()
     Spacer(Modifier.height(28.dp))
     Text(stringResource(R.string.app_name), style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.SemiBold)
     Spacer(Modifier.height(10.dp))

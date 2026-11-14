@@ -11,7 +11,7 @@
     <!-- Onboarding / pairing -->
     <string name="onb_tagline">Copy on your phone, paste on your Mac — and back.</string>
     <string name="onb_step1">Open Syncliko in your Mac’s menu bar</string>
-    <string name="onb_step2">Click “Pair a Device…”</string>
+    <string name="onb_step2">Click “Add Device…”</string>
     <string name="onb_step3">Scan the code with this phone</string>
     <string name="onb_scan">Scan QR code</string>
     <string name="onb_paste">Paste pairing link</string>

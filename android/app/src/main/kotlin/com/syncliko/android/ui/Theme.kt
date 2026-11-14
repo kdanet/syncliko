@@ -99,7 +99,8 @@ private val DarkScheme = darkColorScheme(
     surfaceContainerHighest = Color(0xFF34343A),
 )
 
-/** Colors outside the Material scheme: the hero gradient and status colors, per theme. */
+/** Colors outside the Material scheme: the hero gradient (the Syncliko cobalt of the app icon) and
+ *  status colors, per theme. */
 @Immutable
 data class SynclikoColors(
     val heroGradient: Brush,
@@ -109,15 +110,15 @@ data class SynclikoColors(
 )
 
 private val LightExtras = SynclikoColors(
-    heroGradient = Brush.linearGradient(listOf(Color(0xFF5865F2), Color(0xFF7C3AED))),
+    heroGradient = Brush.verticalGradient(listOf(Color(0xFF3A5CFF), Color(0xFF1F3BDB))),
     onHero = Color.White,
     online = Color(0xFF16A34A),
     warning = Color(0xFFD97706),
 )
 
 private val DarkExtras = SynclikoColors(
-    // Deeper and less saturated than the light variant so it doesn't glare on OLED.
-    heroGradient = Brush.linearGradient(listOf(Color(0xFF3A43B8), Color(0xFF5B2BB5))),
+    // A shade deeper than the light variant so it doesn't glare on OLED.
+    heroGradient = Brush.verticalGradient(listOf(Color(0xFF3453F0), Color(0xFF1B35C8))),
     onHero = Color(0xFFF3F1FF),
     online = Color(0xFF4ADE80),
     warning = Color(0xFFFBBF24),

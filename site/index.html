@@ -330,11 +330,14 @@ h1 .line { display: block; }
    Five scenes share one phone and one MacBook. Phone apps switch like Android does (the old one slides
    up, the next rises in); Mac windows minimise into the Dock and the next one opens out of it. */
 .apps { position: relative; flex: 1; min-height: 0; }
-.app { position: absolute; inset: 0; display: flex; flex-direction: column; background: var(--raised); transition: transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.4s ease; }
-.app:not(.on) { transform: translateY(14%); opacity: 0; pointer-events: none; }
+/* Inactive apps, windows and the photo viewer turn visibility: hidden once their exit animation is over
+   (and visible at once when they come back). Merely transparent, they would stay composited layers that
+   phones redraw on every scroll frame. */
+.app { position: absolute; inset: 0; display: flex; flex-direction: column; background: var(--raised); transition: transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.4s ease, visibility 0s; }
+.app:not(.on) { transform: translateY(14%); opacity: 0; pointer-events: none; visibility: hidden; transition: transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.4s ease, visibility 0s linear 0.55s; }
 .app.gone { transform: translateY(-9%); opacity: 0; }
-.win { transform-origin: 50% 135%; transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.45s ease; }
-.win:not(.on) { transform: translateY(16%) scale(0.12); opacity: 0; pointer-events: none; }
+.win { transform-origin: 50% 135%; transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.45s ease, visibility 0s; }
+.win:not(.on) { transform: translateY(16%) scale(0.12); opacity: 0; pointer-events: none; visibility: hidden; transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.45s ease, visibility 0s linear 0.6s; }
 .dock i.bounce { animation: bounce 0.7s ease; }
 @keyframes bounce { 30% { transform: translateY(-0.7em); } 55% { transform: translateY(0); } 75% { transform: translateY(-0.25em); } }
 
@@ -384,8 +387,8 @@ h1 .line { display: block; }
 .tile svg { display: block; width: 100%; height: 100%; }
 .tile.tap { transform: scale(0.9); box-shadow: 0 0 0 0.16em var(--handle); }
 /* Full screen, over the status bar too (only the camera cutout stays on top), with nothing but the photo. */
-.viewer { position: absolute; inset: -3em 0 -1.4em; z-index: 4; background: #0b0c10; opacity: 0; transform: scale(0.3); pointer-events: none; transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease; }
-.viewer.open { opacity: 1; transform: none; }
+.viewer { position: absolute; inset: -3em 0 -1.4em; z-index: 4; background: #0b0c10; opacity: 0; transform: scale(0.3); pointer-events: none; visibility: hidden; transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease, visibility 0s linear 0.5s; }
+.viewer.open { opacity: 1; transform: none; visibility: visible; transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease, visibility 0s; }
 .shot {
   position: absolute; inset: 0; display: grid; place-items: center;
   background: radial-gradient(62% 40% at 50% 54%, rgba(255, 249, 240, 0.85), transparent 72%), linear-gradient(172deg, #fff0de, #f7c69c);

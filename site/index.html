@@ -509,14 +509,20 @@ h1 .line { display: block; }
 }
 @keyframes case-in { from { opacity: 0; transform: translateY(0.45em); filter: blur(8px); } }
 
-/* Phones: the devices stack (MacBook on top, the phone under it) instead of standing side by side, so
-   both can be large. Type is rescaled so each device keeps exactly its desktop layout inside:
-   the laptop stays 46em wide and the phone 13em wide, whatever the screen. */
+/* Phones: the devices keep standing side by side, each large enough to read, on a row wider than the
+   screen. The stage becomes a camera: it opens on both devices, moves in on the one where the copy
+   happens and follows the clip across to the other (the script sets the transform, see camera()).
+   Type is rescaled so each device keeps exactly its desktop layout inside: the laptop stays 46em wide
+   and the phone 13em wide, whatever the screen. The stage spans the whole screen width and clips the
+   row at its edges, not at the page margins. */
 @media (max-width: 640px) {
-  .stage { aspect-ratio: 100 / 158; }
-  .scene { font-size: 1.99cqw; }
-  .laptop { left: 4%; width: 92%; top: 0; height: 39.7%; }
-  .phone { left: 30%; width: 40%; top: 46.7%; bottom: 0; font-size: 1.53em; }
+  .stage { width: 100vw; margin-inline: calc(50% - 50vw); aspect-ratio: 100 / 66; overflow-x: clip; }
+  .scene { inset: 0 auto auto 0; width: 148cqw; height: 88cqw; font-size: 1.99cqw; transform-origin: 0 0; }
+  .laptop { left: 35.14%; width: 62.16%; top: auto; bottom: 2%; height: 71.4%; }
+  .phone { left: 2.7%; width: 27.03%; top: auto; bottom: 2%; height: 95.7%; font-size: 1.53em; }
+  .laptop, .phone { transition: opacity 0.9s ease; }
+  .scene.cam { transition: transform 1s cubic-bezier(0.65, 0, 0.35, 1); }
+  .scene[data-focus="phone"] .laptop, .scene[data-focus="mac"] .phone { opacity: 0.4; }
 }
 
 /* Reduced motion: no app/window transitions or decorative loops (the scene shows one still frame). */
@@ -1326,6 +1332,40 @@ if (!/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)) {
       overlay.style.top = Math.max(gap, top - overlay.offsetHeight - gap) + 'px';
     }
     function ping() { sy.classList.remove('ping'); void sy.offsetWidth; sy.classList.add('ping'); }
+
+    /* The phone-width camera. The devices stand on one row wider than the screen; the camera frames
+       'both' (pulled back), 'phone' or 'mac', keeping the floor line where it is, and dims the device
+       that is out of focus. ms sets how long the move takes. On wider screens the scene is static. */
+    var narrow = window.matchMedia('(max-width: 640px)');
+    var laptopEl = q('.laptop'), phoneEl = q('.phone'), focusNow = 'both';
+    function box(el) { return { x: el.offsetLeft, y: el.offsetTop, w: el.offsetWidth, h: el.offsetHeight }; }
+    function camera(focus, ms) {
+      focusNow = focus;
+      if (!narrow.matches) {
+        sceneEl.classList.remove('cam'); sceneEl.style.transform = ''; sceneEl.removeAttribute('data-focus');
+        return;
+      }
+      var W = stage.clientWidth, H = stage.clientHeight, m = W * 0.04;
+      var p = box(phoneEl), l = box(laptopEl), b, s, x;
+      if (focus === 'phone') {
+        b = p; s = Math.min(1, (H - m) / b.h);
+        x = Math.max(m, W * 0.07);
+      } else if (focus === 'mac') {
+        b = l; s = Math.min(1, (W - 2 * m) / b.w, (H - m) / b.h);
+        x = (W - s * b.w) / 2;
+      } else {
+        b = { x: p.x, y: Math.min(p.y, l.y), w: l.x + l.w - p.x, h: Math.max(p.y + p.h, l.y + l.h) - Math.min(p.y, l.y) };
+        s = Math.min(1, (W - 2 * m) / b.w, (H - m) / b.h);
+        x = (W - s * b.w) / 2;
+      }
+      // Both devices stand on one floor line, which stays put near the bottom of the frame.
+      var floor = p.y + p.h, tx = x - s * b.x, ty = H * 0.97 - s * floor;
+      sceneEl.style.transitionDuration = (ms == null ? 1000 : ms) + 'ms';
+      sceneEl.classList.toggle('cam', !!ms || ms == null);
+      sceneEl.style.transform = 'translate(' + tx.toFixed(1) + 'px,' + ty.toFixed(1) + 'px) scale(' + s.toFixed(4) + ')';
+      sceneEl.setAttribute('data-focus', focus);
+    }
+    if (narrow.addEventListener) narrow.addEventListener('change', function () { camera(focusNow, 0); });
     /* A delay that doesn't run while the scene is halted (scrolling, off screen, tab hidden), so a scene
        pauses mid-step and carries on where it stopped. */
     function wait(ms) {
@@ -1436,10 +1476,14 @@ if (!/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)) {
       current = sc;
       resetScene(sc);
       show(sc, index, false);
+      camera('both');
+      var srcSide = sc.dir === 'a2m' ? 'phone' : 'mac', dstSide = sc.dir === 'a2m' ? 'mac' : 'phone';
       var settle = Promise.all([settled(q('.win[data-app="' + sc.mac + '"]'), 1400), settled(q('.app[data-app="' + sc.phone + '"]'), 1400)]);
       await wait(1100);
       await settle;
       var src = q('[data-src="' + sc.id + '"]'), dst = q('[data-dst="' + sc.id + '"]');
+      // On a phone screen the camera moves in on the device where the copy happens.
+      if (narrow.matches) { camera(srcSide); await wait(1000); }
       // Open the photo from the gallery grid: the tile is tapped, the viewer grows out of it.
       if (sc.pre === 'gallery') {
         var tileEl = q('[data-tile="' + sc.id + '"]'), viewer = q('.app[data-app="' + sc.phone + '"] .viewer');
@@ -1466,9 +1510,11 @@ if (!/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)) {
         await wait(260); tools.classList.remove('show', 'pressed');
       }
       // Travel.
-      var cv = path(sc);
+      var cv = path(sc), flight = typeof sc.payload === 'string' ? 1500 + sc.payload.length * 20 : 1900;
       if (sc.dir === 'm2a') ping();
-      await flowBytes(sc.payload, rel(src), cv, typeof sc.payload === 'string' ? 1500 + sc.payload.length * 20 : 1900);
+      // ...and follows the clip across to the other one.
+      camera(dstSide, flight);
+      await flowBytes(sc.payload, rel(src), cv, flight);
       if (sc.dir === 'a2m') ping();
       land(cv);
       if (sc.copy !== 'cmdc') src.classList.remove('on');
@@ -1504,6 +1550,7 @@ if (!/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)) {
       var sc = SCENES[0];
       current = sc;
       show(sc, 0, true);
+      camera('both', 0);
       resetScene(sc);
       var src = q('[data-src="' + sc.id + '"]');
       src.classList.add('on');
@@ -1540,10 +1587,17 @@ if (!/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)) {
       if (!started) { started = true; loop(); }
     }
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(begin); else begin();
+    camera('both', 0);
     fitCase();
     settleCase();
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitCase);
-    window.addEventListener('resize', function () { fitCase(); if (reduce.matches) still(); });
+    // Mobile browsers fire resize when the address bar slides away; only a new width reframes the camera.
+    var lastWidth = stage.clientWidth;
+    window.addEventListener('resize', function () {
+      if (stage.clientWidth !== lastWidth) { lastWidth = stage.clientWidth; camera(focusNow, 0); }
+      fitCase();
+      if (reduce.matches) still();
+    });
     if (reduce.addEventListener) reduce.addEventListener('change', begin);
   }
   document.querySelectorAll('.stage').forEach(scene);

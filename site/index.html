@@ -608,21 +608,21 @@ h1 .line { display: block; }
 .chat-side .ws span { color: var(--muted); font-weight: 400; }
 .chat-side .sec { margin-top: 0.5em; font-size: 0.85em; font-weight: 600; color: var(--muted); opacity: 0.8; }
 .chat-side .cur { margin: 0 -0.4em; padding: 0.25em 0.4em; border-radius: 0.4em; background: var(--win-edge); color: var(--ink); }
-.chat-side .unread { display: flex; justify-content: space-between; color: var(--ink); font-weight: 600; }
-.chat-side .unread em { font-style: normal; font-size: 0.85em; padding: 0 0.45em; border-radius: 999px; background: #e0457b; color: #fff; }
+.chat-side .unread { display: flex; justify-content: space-between; align-items: center; color: var(--ink); font-weight: 600; }
+.chat-side .unread em { display: inline-grid; place-items: center; min-width: 1.6em; height: 1.6em; padding: 0 0.4em; box-sizing: border-box; border-radius: 999px; background: #e0457b; color: #fff; font: 700 0.78em/1 var(--text); font-style: normal; font-variant-numeric: tabular-nums; }
 .chat-side .dm { display: flex; align-items: center; gap: 0.45em; }
 .chat-side .dm i { width: 0.55em; height: 0.55em; border-radius: 50%; border: 1px solid var(--muted); }
 .chat-side .dm i.on { border-color: var(--signal); background: var(--signal); }
 .chat-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.5em; padding: 0.7em 1em 0.9em; }
 .chan { display: flex; align-items: baseline; gap: 0.7em; padding-bottom: 0.5em; border-bottom: 1px solid var(--line); font-size: 0.74em; color: var(--muted); }
 .chan b { color: var(--ink); font-size: 1.1em; }
-.feed { flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; gap: 0.55em; }
+.feed { flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; gap: 0.36em; }
 .cm { display: flex; gap: 0.6em; font-size: 0.74em; color: var(--ink); line-height: 1.35; }
 .cm:not([hidden]) { animation: rise 0.4s ease backwards; }
 .cm b { display: block; font-size: 0.95em; margin-bottom: 0.1em; }
 .cm b small { font-weight: 400; color: var(--muted); font-size: 0.85em; margin-left: 0.3em; }
 .cm .av { flex: none; width: 2em; height: 2em; border-radius: 0.5em; display: grid; place-items: center; background: var(--a); color: #fff; font: 700 0.9em/1 var(--text); font-style: normal; }
-.cm .thumb { display: block; width: 4.6em; height: 4.6em; margin-top: 0.3em; }
+.cm .thumb { display: block; width: 3.9em; height: 3.9em; margin-top: 0.3em; }
 .reacts { display: flex; gap: 0.35em; margin-top: 0.4em; }
 .react { display: inline-flex; align-items: center; gap: 0.25em; padding: 0.15em 0.5em; border-radius: 999px; border: 1px solid var(--line); background: var(--code-bg); font-size: 0.9em; }
 .react:not([hidden]) { animation: pop 0.35s cubic-bezier(0.2, 1.4, 0.4, 1) backwards; }
@@ -1869,15 +1869,23 @@ if (!/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)) {
       await wait(1100);
     }
 
+    /* A reply comes in; if the feed no longer has room, the oldest message scrolls away, as in a real
+       channel. */
+    function reply(id) {
+      var feed = q('.feed'), msg = q('[data-chat="' + id + '"]');
+      msg.hidden = false;
+      // The feed is bottom-aligned, so once it overflows the oldest message pokes out above its top.
+      var old = q('[data-chat-old]');
+      if (!old.hidden && old.getBoundingClientRect().top < feed.getBoundingClientRect().top - 1) old.hidden = true;
+    }
     /* After the kitten is pasted: it's sent to the channel, the team reacts, and two replies come in. */
     async function chatReplies(sc) {
       await wait(250);
       qa('[data-fill="' + sc.id + '"]').forEach(function (el) { el.hidden = el.classList.contains('ph') ? false : true; });
       q('[data-chat="post"]').hidden = false;
       for (var r of ['r1', 'r2', 'r3']) { await wait(380); q('[data-chat="' + r + '"]').hidden = false; }
-      // The oldest message scrolls away as the replies come in, as in a real channel.
-      await wait(650); q('[data-chat-old]').hidden = true; q('[data-chat="a1"]').hidden = false;
-      await wait(900); q('[data-chat="a2"]').hidden = false;
+      await wait(650); reply('a1');
+      await wait(900); reply('a2');
       await wait(1200);
     }
 

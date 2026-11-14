@@ -507,6 +507,20 @@ h1 .line { display: block; }
 .thumb { width: 6.4em; height: 6.4em; border-radius: 0.5em; overflow: hidden; box-shadow: 0 0.3em 0.8em -0.4em rgba(10, 12, 30, 0.35); background-image: linear-gradient(#fde7c8, #f2b083); }
 .thumb.fresh { box-shadow: 0 0 0 0.2em var(--select); }
 
+/* Case chips: one per scene, the playing one highlighted like selected text (the page's motif). A tap
+   jumps straight to that scene; the loop carries on from there. */
+.cases { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 0 clamp(12px, 2vw, 22px); }
+.cases button {
+  appearance: none; margin: 0; padding: 0.42em 0.95em; border: 1px solid var(--line); border-radius: 999px;
+  flex: none; background: transparent; color: var(--muted); font: 500 0.95rem/1.2 var(--text); cursor: pointer;
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+.cases button:hover { color: var(--ink); border-color: var(--muted); }
+.cases button[aria-pressed="true"] { background: var(--select); border-color: transparent; color: var(--ink); }
+.cases button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 420px) { .cases { gap: 6px; } .cases button { padding: 0.4em 0.75em; font-size: 0.82rem; } }
+@media (max-width: 350px) { .cases { gap: 5px; } .cases button { padding: 0.38em 0.62em; font-size: 0.78rem; } }
+
 /* Case title over the scene: what is copied, then where it is pasted, in two tones. On a scene change
    the words leave blurred and the new ones rise one by one. The script reserves the height of the
    longest title so the scene never moves. */
@@ -674,6 +688,13 @@ kbd { font: 500 0.86em/1 var(--text); padding: 2px 5px 1px; border: 1px solid va
       </div>
 
       <div class="demo v-dark v-spot">
+        <div class="cases" role="group" aria-label="Examples">
+          <button type="button" data-case="0" aria-pressed="true">Link</button>
+          <button type="button" data-case="1" aria-pressed="false">Address</button>
+          <button type="button" data-case="2" aria-pressed="false">2FA</button>
+          <button type="button" data-case="3" aria-pressed="false">Kitten</button>
+          <button type="button" data-case="4" aria-pressed="false">SMS</button>
+        </div>
         <p class="case" aria-hidden="true" data-id="link"><span class="c-lead"><span class="w" style="--i:0">A</span> <span class="w" style="--i:1">link</span> <span class="w" style="--i:2">from</span> <span class="w" style="--i:3">a</span> <span class="w" style="--i:4">chat,</span></span> <span class="c-rest"><span class="w" style="--i:5">pasted</span> <span class="w" style="--i:6">into</span> <span class="w" style="--i:7">Notes.</span></span></p>
         <div class="stage" role="img" aria-label="Five scenes cycle between an Android phone and a MacBook: a link from a chat pasted into Notes, an address copied on the Mac pasted into a ride app, an authenticator code pasted into GitHub's two-factor sign-in, a kitten picked from the phone's gallery and pasted into a team chat, and an SMS code pasted into a bank sign-in">
           <div class="scene" aria-hidden="true">
@@ -1286,9 +1307,11 @@ if (!/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)) {
       var plain = cs.getPropertyValue('--stream-plain').trim() || '#2f3ab8';
       var cipherInk = cs.getPropertyValue('--stream-cipher').trim() || '#8f98ea';
       var glow = cs.getPropertyValue('--stream-glow').trim() || 'rgba(74, 86, 209, 0.35)';
-      return new Promise(function (done) {
+      var g = gen;
+      return new Promise(function (done, fail) {
         var start = null, prev = null;
         function step(now) {
+          if (g !== gen) { sctx.clearRect(0, 0, sceneEl.offsetWidth, sceneEl.offsetHeight); fail(ABORT); return; }
           if (start === null) start = now;
           // While the page scrolls (or the scene is off screen) the bytes hold still: no drawing, and
           // the clock is pushed back so the flight resumes from the same point.
@@ -1389,10 +1412,15 @@ if (!/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)) {
     if (narrow.addEventListener) narrow.addEventListener('change', function () { camera(focusNow, 0); });
     /* A delay that doesn't run while the scene is halted (scrolling, off screen, tab hidden), so a scene
        pauses mid-step and carries on where it stopped. */
+    /* A tap on a case chip bumps gen: every pending wait and byte flight of the scene in progress then
+       rejects with ABORT, and the loop starts the chosen scene. */
+    var ABORT = {}, gen = 0, jumpTo = null;
     function wait(ms) {
-      return new Promise(function (resolve) {
+      var g = gen;
+      return new Promise(function (resolve, reject) {
         var left = ms, last = performance.now();
         (function tick() {
+          if (g !== gen) { reject(ABORT); return; }
           var now = performance.now();
           if (!halted()) left -= now - last;
           last = now;
@@ -1403,13 +1431,16 @@ if (!/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)) {
     /* Resolves when the element's open/switch transition has finished (or after a safety timeout), so
        the arc is measured on the settled layout, not on a window still growing out of the Dock. */
     function settled(el, max) {
-      return new Promise(function (done) {
-        var t = setTimeout(done, max);
-        el.addEventListener('transitionend', function end(e) {
-          if (e.target !== el || e.propertyName !== 'transform') return;
-          el.removeEventListener('transitionend', end); clearTimeout(t); done();
-        });
+      var g = gen;
+      var p = new Promise(function (done, fail) {
+        function finish(ok) { clearTimeout(t); clearInterval(iv); el.removeEventListener('transitionend', end); if (ok) done(); else fail(ABORT); }
+        function end(e) { if (e.target === el && e.propertyName === 'transform') finish(true); }
+        var t = setTimeout(function () { finish(true); }, max);
+        var iv = setInterval(function () { if (g !== gen) finish(false); }, 50);
+        el.addEventListener('transitionend', end);
       });
+      p.catch(function () {});  // an aborted scene may never await it
+      return p;
     }
 
     /* Switch the phone app and the Mac window, as the systems themselves animate it. */
@@ -1432,6 +1463,7 @@ if (!/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)) {
         }
       });
       appName.textContent = sc.app;
+      chips.forEach(function (c) { c.setAttribute('aria-pressed', String(+c.dataset.case === index)); });
       caseTitle(sc, instant);
     }
     /* The case title, one span per word so the words can enter one after another. */
@@ -1567,10 +1599,11 @@ if (!/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)) {
     }
 
     /* Still frame for reduced motion: the first scene, halfway through its trip. */
-    function still() {
-      var sc = SCENES[0];
+    function still(index) {
+      index = index || 0;
+      var sc = SCENES[index];
       current = sc;
-      show(sc, 0, true);
+      show(sc, index, true);
       camera('both', 0);
       resetScene(sc);
       var src = q('[data-src="' + sc.id + '"]');
@@ -1595,12 +1628,37 @@ if (!/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)) {
     }, { passive: true });
     async function awake() { while (halted()) await new Promise(function (r) { setTimeout(r, 150); }); }
     async function loop() {
-      for (var i = 0; ; i = (i + 1) % SCENES.length) {
+      for (var i = 0; ; ) {
         await awake();
-        if (reduce.matches) { started = false; still(); return; }
-        await play(SCENES[i], i);
+        if (reduce.matches) { started = false; still(i); return; }
+        // A chip tapped while nothing was playing (before the first scene, or while halted between two).
+        if (jumpTo !== null) { i = jumpTo; jumpTo = null; }
+        try {
+          await play(SCENES[i], i);
+          i = (i + 1) % SCENES.length;
+        } catch (e) {
+          if (e !== ABORT) throw e;
+          if (jumpTo !== null) { i = jumpTo; jumpTo = null; }
+          clearTransient();
+        }
       }
     }
+    /* What a scene cut short may leave on screen: overlays, the copy highlight, a tapped tile. */
+    function clearTransient() {
+      [key, tools, toastEl, pasteTip].forEach(function (el) { el.classList.remove('show', 'pressed'); });
+      qa('[data-src].on, .tile.tap').forEach(function (el) { el.classList.remove('on', 'tap'); });
+      qa('.fresh').forEach(function (el) { el.classList.remove('fresh'); });
+      ripple.classList.remove('go');
+    }
+    var chips = Array.prototype.slice.call(demo.querySelectorAll('.cases button'));
+    chips.forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        var i = +chip.dataset.case;
+        if (reduce.matches) { still(i); return; }
+        jumpTo = i; gen++;
+        chips.forEach(function (c) { c.setAttribute('aria-pressed', String(c === chip)); });
+      });
+    });
 
     var started = false;
     function begin() {

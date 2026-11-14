@@ -327,7 +327,7 @@ h1 .line { display: block; }
 
 
 /* ---------- Scenario playlist ----------
-   Five scenes share one phone and one MacBook. Phone apps switch like Android does (the old one slides
+   Six scenes share one phone and one MacBook. Phone apps switch like Android does (the old one slides
    up, the next rises in); Mac windows minimise into the Dock and the next one opens out of it. */
 .apps { position: relative; flex: 1; min-height: 0; }
 /* Inactive apps, windows and the photo viewer turn visibility: hidden once their exit animation is over
@@ -366,6 +366,29 @@ h1 .line { display: block; }
 .sheet .field { flex: none; }
 .okchip { font: 600 0.66em/1.2 var(--text); color: var(--signal); }
 .recent { font-size: 0.64em; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Phone: a music app's sign-in. The pasted password lands as dots; a moment later the app opens on its
+   home screen (albums and a mini player) over the form. */
+.app-music { padding: 1.4em 0.9em 0.8em; gap: 0.55em; }
+.enc-logo { width: 2.6em; height: 2.6em; margin: 0.6em auto 0.2em; border-radius: 0.8em; background: linear-gradient(140deg, #ff6a88, #ff9a5a); display: grid; place-items: center; }
+.enc-logo::after { content: ""; width: 0.9em; height: 0.9em; border-radius: 50%; background: #fff; box-shadow: 0 0 0 0.28em rgba(255, 255, 255, 0.35); }
+.enc-h { text-align: center; font: 700 0.98em/1.25 var(--text); color: var(--ink); margin-bottom: 0.3em; }
+.enc-label { font-size: 0.58em; font-weight: 600; color: var(--muted); margin-bottom: -0.3em; padding-left: 0.3em; }
+.app-music .field { flex: none; border-radius: 0.7em; }
+.app-music .field .val { color: var(--ink); font: 700 1em/1 var(--mono); letter-spacing: 0.06em; }
+.enc-btn { margin-top: 0.3em; height: 2.3em; display: grid; place-items: center; border-radius: 1.15em; background: linear-gradient(140deg, #ff6a88, #ff9a5a); color: #fff; font: 600 0.78em/1 var(--text); }
+.enc-forgot { text-align: center; font-size: 0.6em; color: var(--muted); }
+.enc-home { position: absolute; inset: 0; z-index: 2; display: flex; flex-direction: column; gap: 0.6em; padding: 1.4em 0.9em 0.8em; background: var(--raised); }
+.enc-home.ok:not([hidden]) { animation: rise 0.5s ease 0.9s backwards; }
+.enc-home b { font: 700 1.05em/1.2 var(--text); color: var(--ink); }
+.enc-home small { display: block; margin-bottom: 0.2em; font-size: 0.6em; color: var(--muted); }
+.albums { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5em; }
+.albums i { aspect-ratio: 1; border-radius: 0.6em; background: var(--c); }
+.player { margin-top: auto; display: flex; align-items: center; gap: 0.6em; padding: 0.5em; border-radius: 0.8em; background: var(--code-bg); font-size: 0.62em; color: var(--ink); }
+.player i { width: 2.4em; height: 2.4em; border-radius: 0.5em; background: linear-gradient(140deg, #7a5cff, #ff6a88); flex: none; }
+.player span { flex: 1; min-width: 0; }
+.player small { display: block; font-size: 0.9em; }
+.player em { font-style: normal; font-size: 1.3em; }
 
 /* Phone: authenticator */
 .a-head { padding: 0.5em 0.9em 0.7em; font: 700 1em/1.2 var(--text); color: var(--ink); }
@@ -473,6 +496,34 @@ h1 .line { display: block; }
 .bank-card span { font: 500 0.95em/1 var(--mono); letter-spacing: 0.08em; }
 .bank-card small { font: 500 0.6em/1 var(--text); letter-spacing: 0.1em; opacity: 0.8; }
 .w-chat .wbody { flex-direction: row; align-items: stretch; gap: 0; padding: 0; }
+/* The Mac's Passwords app: categories, the account list, and the selected account's card. The password
+   shows as dots, as it does there, and is copied with ⌘C. */
+.w-pw .wbody { flex-direction: row; align-items: stretch; gap: 0; padding: 0; }
+.pw-side { width: 21%; display: flex; flex-direction: column; gap: 0.3em; padding: 0.8em 0.6em; background: var(--side); font-size: 0.7em; color: var(--ink); }
+.pw-side span { display: flex; align-items: center; gap: 0.5em; padding: 0.28em 0.4em; border-radius: 0.4em; }
+.pw-side span.cur { background: var(--win-edge); }
+.pw-side i { width: 1.25em; height: 1.25em; border-radius: 0.35em; background: var(--c); flex: none; }
+.pw-list { width: 29%; display: flex; flex-direction: column; padding: 0.7em 0.5em; border-right: 1px solid var(--line); font-size: 0.7em; }
+.pw-list .row { display: flex; align-items: center; gap: 0.6em; padding: 0.42em 0.5em; border-radius: 0.45em; min-width: 0; }
+.pw-list .row.cur { background: #2f6cf0; color: #fff; }   /* macOS selection blue, both themes */
+.pw-list .row.cur small { color: rgba(255, 255, 255, 0.78); }
+.pw-list .row div { min-width: 0; }
+.pw-list b { display: block; font-weight: 600; }
+.pw-list small { display: block; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.site { width: 1.7em; height: 1.7em; border-radius: 0.45em; background: var(--c); flex: none; display: grid; place-items: center; font: 700 0.85em/1 var(--text); color: #fff; }
+.pw-card { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.7em; padding: 1em 1.3em; font-size: 0.78em; }
+.pw-title { display: flex; align-items: center; gap: 0.8em; }
+.pw-title .site { width: 2.6em; height: 2.6em; border-radius: 0.65em; font-size: 1.1em; }
+.pw-title b { display: block; font: 700 1.3em/1.2 var(--text); color: var(--ink); }
+.pw-title small { color: var(--muted); font-size: 0.85em; }
+.pw-fields { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 0.7em; }
+.pw-fields > span { display: flex; justify-content: space-between; align-items: center; gap: 1em; padding: 0.55em 0.85em; }
+.pw-fields > span + span { border-top: 1px solid var(--line); }
+.pw-fields em { font-style: normal; color: var(--muted); }
+.pw-fields .dots { font: 700 1em/1 var(--mono); letter-spacing: 0.08em; padding: 0.15em 0.2em; }
+.pw-fields .site-link { color: var(--accent); }
+.pw-note { color: var(--muted); font-size: 0.85em; }
+
 /* A team chat: workspace sidebar (channels with an unread count, people with presence), the channel's
    header, a feed with avatars and times, and the composer. After the paste the kitten is posted and the
    team reacts (see chatReplies in the script). */
@@ -520,6 +571,14 @@ h1 .line { display: block; }
 .cases button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 @media (max-width: 420px) { .cases { gap: 6px; } .cases button { padding: 0.4em 0.75em; font-size: 0.82rem; } }
 @media (max-width: 350px) { .cases { gap: 5px; } .cases button { padding: 0.38em 0.62em; font-size: 0.78rem; } }
+/* Phones: when the chips don't fit, the row runs to the screen edges and scrolls sideways; the script
+   keeps the playing chip in view. */
+@media (max-width: 640px) {
+  .cases {
+    margin-inline: calc(50% - 50vw);
+    padding-inline: max(16px, env(safe-area-inset-left, 0px)) max(16px, env(safe-area-inset-right, 0px));
+  }
+}
 
 /* Case title over the scene: what is copied, then where it is pasted, in two tones. On a scene change
    the words leave blurred and the new ones rise one by one. The script reserves the height of the
@@ -690,13 +749,14 @@ kbd { font: 500 0.86em/1 var(--text); padding: 2px 5px 1px; border: 1px solid va
       <div class="demo v-dark v-spot">
         <div class="cases" role="group" aria-label="Examples">
           <button type="button" data-case="0" aria-pressed="true">Link</button>
-          <button type="button" data-case="1" aria-pressed="false">Address</button>
-          <button type="button" data-case="2" aria-pressed="false">2FA</button>
-          <button type="button" data-case="3" aria-pressed="false">Kitten</button>
-          <button type="button" data-case="4" aria-pressed="false">SMS</button>
+          <button type="button" data-case="1" aria-pressed="false">Kitten</button>
+          <button type="button" data-case="2" aria-pressed="false">Address</button>
+          <button type="button" data-case="3" aria-pressed="false">2FA</button>
+          <button type="button" data-case="4" aria-pressed="false">Password</button>
+          <button type="button" data-case="5" aria-pressed="false">SMS</button>
         </div>
         <p class="case" aria-hidden="true" data-id="link"><span class="c-lead"><span class="w" style="--i:0">A</span> <span class="w" style="--i:1">link</span> <span class="w" style="--i:2">from</span> <span class="w" style="--i:3">a</span> <span class="w" style="--i:4">chat,</span></span> <span class="c-rest"><span class="w" style="--i:5">pasted</span> <span class="w" style="--i:6">into</span> <span class="w" style="--i:7">Notes.</span></span></p>
-        <div class="stage" role="img" aria-label="Five scenes cycle between an Android phone and a MacBook: a link from a chat pasted into Notes, an address copied on the Mac pasted into a ride app, an authenticator code pasted into GitHub's two-factor sign-in, a kitten picked from the phone's gallery and pasted into a team chat, and an SMS code pasted into a bank sign-in">
+        <div class="stage" role="img" aria-label="Six scenes cycle between an Android phone and a MacBook: a link from a chat pasted into Notes, an address copied on the Mac pasted into a ride app, an authenticator code pasted into GitHub's two-factor sign-in, a password copied from the Mac's Passwords app signing in to a music app on the phone, a kitten picked from the phone's gallery and pasted into a team chat, and an SMS code pasted into a bank sign-in">
           <div class="scene" aria-hidden="true">
 <svg class="defs" aria-hidden="true" width="0" height="0">
               <defs>
@@ -871,6 +931,34 @@ kbd { font: 500 0.86em/1 var(--text); padding: 2px 5px 1px; border: 1px solid va
                     </div>
                   </div>
                 </div>
+                <div class="win w-pw" data-app="pass">
+                  <div class="wbar"><div class="lights"><i></i><i></i><i></i></div><span class="url">Passwords</span></div>
+                  <div class="wbody">
+                    <div class="pw-side">
+                      <span class="cur"><i style="--c: linear-gradient(160deg, #6fb6ff, #2a6cf0)"></i>All</span>
+                      <span><i style="--c: linear-gradient(160deg, #7ee2a0, #23a55a)"></i>Passkeys</span>
+                      <span><i style="--c: linear-gradient(160deg, #ffd66b, #f2a400)"></i>Codes</span>
+                      <span><i style="--c: linear-gradient(160deg, #8fd0ff, #2b9cf0)"></i>Wi‑Fi</span>
+                      <span><i style="--c: linear-gradient(160deg, #ff8a8a, #e5484d)"></i>Security</span>
+                    </div>
+                    <div class="pw-list">
+                      <span class="row"><i class="site" style="--c: #24292f">G</i><div><b>GitHub</b><small>lena-dev</small></div></span>
+                      <span class="row cur"><i class="site" style="--c: linear-gradient(140deg, #ff6a88, #ff9a5a)">E</i><div><b>Encore</b><small>lena@example.com</small></div></span>
+                      <span class="row"><i class="site" style="--c: #a259ff">F</i><div><b>Figma</b><small>lena@example.com</small></div></span>
+                      <span class="row"><i class="site" style="--c: linear-gradient(140deg, #3fd6c6, #3a7bff)">M</i><div><b>Meridian</b><small>lsokolova</small></div></span>
+                      <span class="row"><i class="site" style="--c: #0e8a5f">S</i><div><b>Studio</b><small>lena@example.com</small></div></span>
+                    </div>
+                    <div class="pw-card">
+                      <div class="pw-title"><i class="site" style="--c: linear-gradient(140deg, #ff6a88, #ff9a5a)">E</i><div><b>Encore</b><small>Last modified Nov 2</small></div></div>
+                      <div class="pw-fields">
+                        <span><em>User name</em>lena@example.com</span>
+                        <span><em>Password</em><span class="dots msel" data-src="pass">••••••••••••</span></span>
+                        <span><em>Website</em><span class="site-link">encore.example</span></span>
+                      </div>
+                      <span class="pw-note">Shared with: only you · No known compromises</span>
+                    </div>
+                  </div>
+                </div>
                 <div class="win w-web w-bank" data-app="bank">
                   <div class="wbar"><div class="lights"><i></i><i></i><i></i></div><span class="url">meridianbank.example</span></div>
                   <div class="bank-top">
@@ -894,7 +982,7 @@ kbd { font: 500 0.86em/1 var(--text); padding: 2px 5px 1px; border: 1px solid va
                   <i data-dock="chat" style="--c: linear-gradient(160deg, #b9a2ff, #6a4cf0)"></i>
                   <i style="--c: linear-gradient(160deg, #6ee39a, #12b04c)"></i>
                   <i class="run" data-dock="notes" style="--c: linear-gradient(160deg, #ffe680, #f6b800)"></i>
-                  <i style="--c: linear-gradient(160deg, #b7bbc7, #737887)"></i>
+                  <i data-dock="pass" style="--c: linear-gradient(160deg, #b7bbc7, #737887)"></i>
                   <span class="sep"></span>
                   <i style="--c: linear-gradient(160deg, #e9ebf1, #b8bcc8)"></i>
                 </div>
@@ -927,6 +1015,21 @@ kbd { font: 500 0.86em/1 var(--text); padding: 2px 5px 1px; border: 1px solid va
                       <span class="okchip ok" data-fill="addr">Route ready · 14 min · 8.2 km</span>
                       <span class="recent">⌂&nbsp; Home · Lesnaya St 5</span>
                       <span class="recent">▣&nbsp; Work · Tverskaya St 12</span>
+                    </div>
+                  </div>
+                  <div class="app app-music" data-app="music">
+                    <i class="enc-logo"></i>
+                    <b class="enc-h">Sign in to Encore</b>
+                    <span class="enc-label">Email</span>
+                    <span class="field"><span class="typed">lena@example.com</span></span>
+                    <span class="enc-label">Password</span>
+                    <span class="field" data-dst="pass"><span class="ph" data-fill="pass">Password</span><span class="val" data-fill="pass">••••••••••••</span></span>
+                    <span class="enc-btn">Sign in</span>
+                    <span class="enc-forgot">Forgot password?</span>
+                    <div class="enc-home ok" data-fill="pass" hidden>
+                      <span><small>Good evening</small><b>Welcome back, Lena</b></span>
+                      <div class="albums"><i style="--c: linear-gradient(140deg, #7a5cff, #ff6a88)"></i><i style="--c: linear-gradient(140deg, #22c1c3, #2b6cf0)"></i><i style="--c: linear-gradient(140deg, #f7b733, #fc4a1a)"></i><i style="--c: linear-gradient(140deg, #43e97b, #1d976c)"></i></div>
+                      <div class="player"><i></i><span>Night Drive<small>Encore Mix · for Lena</small></span><em>❚❚</em></div>
                     </div>
                   </div>
                   <div class="app" data-app="auth">
@@ -1244,9 +1347,10 @@ if (!/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)) {
     var JPEG = [0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46, 0x00, 0x01, 0x01, 0x00, 0x00, 0x48, 0x00, 0x48, 0xff, 0xdb];
     var SCENES = [
       { id: 'link', lead: 'A link from a chat,', rest: 'pasted into Notes.', dir: 'a2m', phone: 'msg', mac: 'notes', app: 'Notes', dock: 'notes', copy: 'select', payload: 'table.io/r/8KX2-Q4' },
+      { id: 'shot', lead: 'A kitten from the gallery,', rest: 'pasted into the team chat.', dir: 'a2m', phone: 'photo', mac: 'chat', app: 'Chat', dock: 'chat', copy: 'select', pre: 'gallery', payload: JPEG },
       { id: 'addr', lead: 'An address on the Mac,', rest: 'pasted into a ride.', dir: 'm2a', phone: 'taxi', mac: 'place', app: 'Safari', dock: 'web', copy: 'cmdc', payload: 'Pokrovka St 17, Moscow' },
       { id: 'totp', lead: 'An authenticator code,', rest: 'pasted into GitHub.', dir: 'a2m', phone: 'auth', mac: 'twofa', app: 'Safari', dock: 'web', copy: 'tap', payload: '482913' },
-      { id: 'shot', lead: 'A kitten from the gallery,', rest: 'pasted into the team chat.', dir: 'a2m', phone: 'photo', mac: 'chat', app: 'Chat', dock: 'chat', copy: 'select', pre: 'gallery', payload: JPEG },
+      { id: 'pass', lead: 'A password from the Mac,', rest: 'pasted into a music app.', dir: 'm2a', phone: 'music', mac: 'pass', app: 'Passwords', dock: 'pass', copy: 'cmdc', secret: true, payload: 'Tq7#vR2m!kL9' },
       { id: 'sms', lead: 'A code from an SMS,', rest: 'pasted into the bank.', dir: 'a2m', phone: 'sms', mac: 'bank', app: 'Safari', dock: 'web', copy: 'select', payload: '739204' }
     ];
     var current = SCENES[0];
@@ -1289,9 +1393,11 @@ if (!/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)) {
       });
       return out;
     }
-    function flowBytes(payload, src, cv, ms, freeze) {
+    function flowBytes(payload, src, cv, ms, freeze, secret) {
       sizeStream();
       var glyphs = glyphsOf(payload), n = glyphs.length, parts = [];
+      // A password never shows in the clear, not even as hex: dots at both ends, ciphertext in between.
+      if (secret) glyphs = glyphs.map(function () { return { ch: '•', hex: '••' }; });
       var size = parseFloat(getComputedStyle(sceneEl).fontSize) * 0.78;
       for (var k = 0; k < 3; k++) {
         glyphs.forEach(function (g, i) {
@@ -1464,6 +1570,7 @@ if (!/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)) {
       });
       appName.textContent = sc.app;
       chips.forEach(function (c) { c.setAttribute('aria-pressed', String(+c.dataset.case === index)); });
+      chipInView(chips[index]);
       caseTitle(sc, instant);
     }
     /* The case title, one span per word so the words can enter one after another. */
@@ -1567,7 +1674,7 @@ if (!/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)) {
       if (sc.dir === 'm2a') ping();
       // ...and follows the clip across to the other one.
       camera(dstSide, flight);
-      await flowBytes(sc.payload, rel(src), cv, flight);
+      await flowBytes(sc.payload, rel(src), cv, flight, null, sc.secret);
       if (sc.dir === 'a2m') ping();
       land(cv);
       if (sc.copy !== 'cmdc') src.classList.remove('on');
@@ -1651,6 +1758,14 @@ if (!/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)) {
       ripple.classList.remove('go');
     }
     var chips = Array.prototype.slice.call(demo.querySelectorAll('.cases button'));
+    // Scrolls the chip row (not the page) so the given chip is fully visible.
+    function chipInView(chip) {
+      var row = chip && chip.parentNode;
+      if (!row || row.scrollWidth <= row.clientWidth) return;
+      var pad = 16, left = chip.offsetLeft - row.offsetLeft, right = left + chip.offsetWidth;
+      if (left - pad < row.scrollLeft) row.scrollTo({ left: left - pad, behavior: 'smooth' });
+      else if (right + pad > row.scrollLeft + row.clientWidth) row.scrollTo({ left: right + pad - row.clientWidth, behavior: 'smooth' });
+    }
     chips.forEach(function (chip) {
       chip.addEventListener('click', function () {
         var i = +chip.dataset.case;

@@ -195,7 +195,7 @@ h1 .line { display: block; }
 /* One note in its own window, the way Notes opens a note on double-click: window buttons, a small
    toolbar, no title-bar rule, large corner radius and a soft shadow. */
 .win {
-  position: absolute; left: 13%; right: 13%; top: 11%; bottom: 33%;
+  position: absolute; left: 6%; right: 6%; top: 10.5%; bottom: 17%;
   display: flex; flex-direction: column;
   background: var(--raised); border-radius: 1.1em; overflow: hidden;
   box-shadow: 0 0 0 1px var(--win-edge), 0 2em 3.6em -1.6em rgba(10, 12, 30, 0.5);
@@ -430,11 +430,57 @@ h1 .line { display: block; }
 .wfield { display: flex; align-items: center; gap: 0.6em; width: 13em; height: 2.2em; margin-top: 0.4em; padding: 0 0.8em; border: 1px solid var(--line); border-radius: 0.5em; font: 500 0.9em/1 var(--mono); color: var(--muted); }
 .wfield .val { color: var(--ink); }
 .okline { font-size: 0.82em; font-weight: 600; color: var(--signal); }
+/* A bank's sign-in page: the bank's own header bar, a code form and the customer's card. The bank is made
+   up (Meridian) so the page doesn't borrow a real bank's brand. */
+.w-bank .wbar { padding-bottom: 0.6em; }
+.bank-top { display: flex; align-items: center; gap: 1.4em; padding: 0.75em 1.4em; background: #0d2c5e; color: #e8eefc; font-size: 0.74em; }
+.bank-brand { display: flex; align-items: center; gap: 0.5em; font: 700 1.15em/1 var(--display); letter-spacing: -0.01em; color: #fff; }
+.bank-mark { width: 1.3em; height: 1.3em; border-radius: 0.35em; background: conic-gradient(from 210deg, #3fd6c6, #3a7bff, #3fd6c6); }
+.bank-nav { display: flex; gap: 1.1em; color: #b9c8ea; }
+.bank-nav span:first-child { color: #fff; }
+.bank-secure { margin-left: auto; display: flex; align-items: center; gap: 0.35em; padding: 0.3em 0.6em; border-radius: 999px; background: rgba(255, 255, 255, 0.12); color: #cfe0ff; }
+.bank-secure svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.bank-body { flex: 1; min-height: 0; display: flex; align-items: center; gap: 2em; padding: 1em 1.8em 1.2em; font-size: 0.86em; }
+.bank-form { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 0.45em; }
+.bank-form h6 { margin: 0; font: 700 1.4em/1.2 var(--text); color: var(--ink); }
+.bank-form .muted { font-size: 0.82em; color: var(--muted); }
+.bank-row { display: flex; align-items: center; gap: 1em; margin-top: 0.5em; }
+.bank-btn { padding: 0.55em 1.6em; border-radius: 0.5em; background: #1f5fd6; color: #fff; font: 600 0.82em/1 var(--text); }
+.bank-card { flex: none; position: relative; width: 11em; aspect-ratio: 1.586; border-radius: 0.8em; padding: 0.8em 0.9em; display: flex; flex-direction: column; justify-content: space-between;
+  background: linear-gradient(135deg, #123b7d 0%, #1f5fd6 55%, #33c2b5 100%); color: #fff; box-shadow: 0 1em 1.6em -0.9em rgba(10, 20, 60, 0.6); font-size: 0.8em; }
+.bank-card b { font: 700 0.95em/1 var(--display); }
+.bank-card .chip { width: 1.8em; height: 1.35em; border-radius: 0.3em; background: linear-gradient(135deg, #f4d58d, #c79a3c); }
+.bank-card span { font: 500 0.95em/1 var(--mono); letter-spacing: 0.08em; }
+.bank-card small { font: 500 0.6em/1 var(--text); letter-spacing: 0.1em; opacity: 0.8; }
 .w-chat .wbody { flex-direction: row; align-items: stretch; gap: 0; padding: 0; }
-.chat-side { width: 27%; display: flex; flex-direction: column; gap: 0.35em; padding: 0.8em 0.7em; background: var(--side); font-size: 0.72em; color: var(--muted); }
-.chat-side b { color: var(--ink); margin-bottom: 0.3em; }
+/* A team chat: workspace sidebar (channels with an unread count, people with presence), the channel's
+   header, a feed with avatars and times, and the composer. After the paste the kitten is posted and the
+   team reacts (see chatReplies in the script). */
+.chat-side { width: 24%; display: flex; flex-direction: column; gap: 0.38em; padding: 0.8em 0.7em; background: var(--side); font-size: 0.7em; color: var(--muted); }
+.chat-side .ws { display: flex; justify-content: space-between; color: var(--ink); font-size: 1.05em; margin-bottom: 0.2em; }
+.chat-side .ws span { color: var(--muted); font-weight: 400; }
+.chat-side .sec { margin-top: 0.5em; font-size: 0.85em; font-weight: 600; color: var(--muted); opacity: 0.8; }
 .chat-side .cur { margin: 0 -0.4em; padding: 0.25em 0.4em; border-radius: 0.4em; background: var(--win-edge); color: var(--ink); }
-.chat-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.6em; padding: 0.9em 1em; }
+.chat-side .unread { display: flex; justify-content: space-between; color: var(--ink); font-weight: 600; }
+.chat-side .unread em { font-style: normal; font-size: 0.85em; padding: 0 0.45em; border-radius: 999px; background: #e0457b; color: #fff; }
+.chat-side .dm { display: flex; align-items: center; gap: 0.45em; }
+.chat-side .dm i { width: 0.55em; height: 0.55em; border-radius: 50%; border: 1px solid var(--muted); }
+.chat-side .dm i.on { border-color: var(--signal); background: var(--signal); }
+.chat-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.5em; padding: 0.7em 1em 0.9em; }
+.chan { display: flex; align-items: baseline; gap: 0.7em; padding-bottom: 0.5em; border-bottom: 1px solid var(--line); font-size: 0.74em; color: var(--muted); }
+.chan b { color: var(--ink); font-size: 1.1em; }
+.feed { flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; gap: 0.55em; }
+.cm { display: flex; gap: 0.6em; font-size: 0.74em; color: var(--ink); line-height: 1.35; }
+.cm:not([hidden]) { animation: rise 0.4s ease both; }
+.cm b { display: block; font-size: 0.95em; margin-bottom: 0.1em; }
+.cm b small { font-weight: 400; color: var(--muted); font-size: 0.85em; margin-left: 0.3em; }
+.cm .av { flex: none; width: 2em; height: 2em; border-radius: 0.5em; display: grid; place-items: center; background: var(--a); color: #fff; font: 700 0.9em/1 var(--text); font-style: normal; }
+.cm .thumb { display: block; width: 4.6em; height: 4.6em; margin-top: 0.3em; }
+.reacts { display: flex; gap: 0.35em; margin-top: 0.4em; }
+.react { display: inline-flex; align-items: center; gap: 0.25em; padding: 0.15em 0.5em; border-radius: 999px; border: 1px solid var(--line); background: var(--code-bg); font-size: 0.9em; }
+.react:not([hidden]) { animation: pop 0.35s cubic-bezier(0.2, 1.4, 0.4, 1) both; }
+.react em { font-style: normal; font-size: 0.85em; color: var(--muted); }
+@keyframes pop { from { transform: scale(0.4); opacity: 0; } }
 .msg { font-size: 0.78em; color: var(--ink); }
 .msg b { display: block; font-size: 0.9em; margin-bottom: 0.1em; }
 .composer { margin-top: auto; display: flex; align-items: center; gap: 0.6em; min-height: 2.6em; padding: 0.45em 0.7em; border: 1px solid var(--line); border-radius: 0.6em; font-size: 0.74em; color: var(--muted); }
@@ -742,24 +788,49 @@ kbd { font: 500 0.86em/1 var(--text); padding: 2px 5px 1px; border: 1px solid va
                   </div>
                 </div>
                 <div class="win w-chat" data-app="chat">
-                  <div class="wbar"><div class="lights"><i></i><i></i><i></i></div><span class="url"># design</span></div>
+                  <div class="wbar"><div class="lights"><i></i><i></i><i></i></div><span class="url">Studio · #design</span></div>
                   <div class="wbody">
-                    <div class="chat-side"><b>Studio</b><span># general</span><span class="cur"># design</span><span># release</span><span>Anna</span><span>Mark</span></div>
+                    <div class="chat-side">
+                      <b class="ws">Studio <span>⌄</span></b>
+                      <span class="sec">Channels</span>
+                      <span># general</span>
+                      <span class="cur"># design</span>
+                      <span class="unread"># release <em>3</em></span>
+                      <span class="sec">Direct messages</span>
+                      <span class="dm"><i class="on"></i>Anna</span>
+                      <span class="dm"><i class="on"></i>Mark</span>
+                      <span class="dm"><i></i>Lena</span>
+                    </div>
                     <div class="chat-main">
-                      <div class="msg"><b>Anna</b>Standup in 5. Everyone alive?</div>
-                      <div class="msg"><b>Mark</b>Barely. Someone post the cat</div>
+                      <div class="chan"><b># design</b><span>8 members · Release 2.4 on Friday</span></div>
+                      <div class="feed">
+                        <div class="cm" data-chat-old><i class="av" style="--a: #e2735a">A</i><div><b>Anna <small>10:01</small></b>Standup in 5. Everyone alive?</div></div>
+                        <div class="cm"><i class="av" style="--a: #4f8be8">M</i><div><b>Mark <small>10:02</small></b>Barely. Someone post the cat 🙏</div></div>
+                        <div class="cm post" data-chat="post" hidden><i class="av" style="--a: #8b6cf0">L</i><div><b>Lena <small>10:03</small></b><span class="thumb"><svg viewBox="0 0 60 60"><use href="#g-kitty"/></svg></span>
+                          <span class="reacts"><span class="react" data-chat="r1" hidden>😻 <em>4</em></span><span class="react" data-chat="r2" hidden>🔥 <em>3</em></span><span class="react" data-chat="r3" hidden>🙌 <em>2</em></span></span></div></div>
+                        <div class="cm" data-chat="a1" hidden><i class="av" style="--a: #e2735a">A</i><div><b>Anna <small>10:03</small></b>omg 😍 best standup ever</div></div>
+                        <div class="cm" data-chat="a2" hidden><i class="av" style="--a: #4f8be8">M</i><div><b>Mark <small>10:04</small></b>ok I’m awake now. Ship it</div></div>
+                      </div>
                       <div class="composer" data-dst="shot"><span class="ph" data-fill="shot">Message #design</span><span class="thumb val" data-fill="shot"><svg viewBox="0 0 60 60"><use href="#g-kitty"/></svg></span></div>
                     </div>
                   </div>
                 </div>
-                <div class="win w-web" data-app="bank">
-                  <div class="wbar"><div class="lights"><i></i><i></i><i></i></div><span class="url">online.bank.example</span></div>
-                  <div class="wbody">
-                    <i class="logo sq"></i>
-                    <h6>Confirm sign-in</h6>
-                    <span class="muted">We sent a code to your phone by SMS.</span>
-                    <span class="wfield" data-dst="sms"><span class="ph" data-fill="sms">Code from SMS</span><span class="val" data-fill="sms">739204</span></span>
-                    <span class="okline ok" data-fill="sms">✓ Welcome back</span>
+                <div class="win w-web w-bank" data-app="bank">
+                  <div class="wbar"><div class="lights"><i></i><i></i><i></i></div><span class="url">meridianbank.example</span></div>
+                  <div class="bank-top">
+                    <span class="bank-brand"><i class="bank-mark"></i>Meridian</span>
+                    <span class="bank-nav"><span>Accounts</span><span>Payments</span><span>Cards</span><span>Help</span></span>
+                    <span class="bank-secure"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/></svg>Secure</span>
+                  </div>
+                  <div class="bank-body">
+                    <div class="bank-form">
+                      <h6>Confirm it’s you</h6>
+                      <span class="muted">We sent a 6-digit code to •••• 0418 by SMS.</span>
+                      <span class="otp" data-dst="sms"><i><span class="val" data-fill="sms">7</span></i><i><span class="val" data-fill="sms">3</span></i><i><span class="val" data-fill="sms">9</span></i><i><span class="val" data-fill="sms">2</span></i><i><span class="val" data-fill="sms">0</span></i><i><span class="val" data-fill="sms">4</span></i></span>
+                      <span class="bank-row"><span class="bank-btn">Confirm</span><span class="muted">Resend in 0:42</span></span>
+                      <span class="okline ok" data-fill="sms">✓ Welcome back, Lena</span>
+                    </div>
+                    <div class="bank-card" aria-hidden="true"><b>Meridian</b><i class="chip"></i><span>•••• 4471</span><small>LENA SOKOLOVA</small></div>
                   </div>
                 </div>
                 <div class="dock">
@@ -1323,6 +1394,10 @@ if (!/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)) {
       var src = q('[data-src="' + sc.id + '"]');
       if (src) src.classList.remove('on');
       qa('.viewer').forEach(function (v) { v.classList.remove('open'); });
+      if (sc.id === 'shot') {
+        qa('[data-chat]').forEach(function (el) { el.hidden = true; });
+        qa('[data-chat-old]').forEach(function (el) { el.hidden = false; });
+      }
     }
     function fill(sc) {
       qa('[data-fill="' + sc.id + '"]').forEach(function (el) {
@@ -1389,7 +1464,20 @@ if (!/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)) {
       src.classList.remove('on');
       fill(sc);
       await wait(1700); unfresh(sc);
+      if (sc.id === 'shot') await chatReplies(sc);
       await wait(1100);
+    }
+
+    /* After the kitten is pasted: it's sent to the channel, the team reacts, and two replies come in. */
+    async function chatReplies(sc) {
+      await wait(250);
+      qa('[data-fill="' + sc.id + '"]').forEach(function (el) { el.hidden = el.classList.contains('ph') ? false : true; });
+      q('[data-chat="post"]').hidden = false;
+      for (var r of ['r1', 'r2', 'r3']) { await wait(380); q('[data-chat="' + r + '"]').hidden = false; }
+      // The oldest message scrolls away as the replies come in, as in a real channel.
+      await wait(650); q('[data-chat-old]').hidden = true; q('[data-chat="a1"]').hidden = false;
+      await wait(900); q('[data-chat="a2"]').hidden = false;
+      await wait(1200);
     }
 
     /* Still frame for reduced motion: the first scene, halfway through its trip. */

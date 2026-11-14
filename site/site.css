@@ -107,9 +107,9 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
 .btn:hover { border-color: var(--muted); }
 .btn.primary:hover { border-color: var(--ink); opacity: 0.88; }
 .btn.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
-/* Platform icons in download buttons. The Mac one is the Apple glyph; where the font lacks it, a laptop. */
+/* Platform icons in download buttons. The Mac one is the Apple glyph; where the font lacks it, the page's
+   script shows a laptop instead. The SVGs also carry width and height, so they stay small without this file. */
 .btn .os-icon { flex: none; width: 1.2em; height: 1.2em; display: block; }
 .btn .apple { width: auto; height: auto; font: 400 1.25em/1 -apple-system, BlinkMacSystemFont, sans-serif; transform: translateY(-0.06em); }
 .btn .android { width: 1.5em; height: 0.92em; }
-.btn .mac-fallback { display: none; }
-.no-apple-glyph .btn .mac-fallback { display: block; }
+

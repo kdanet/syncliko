@@ -9,6 +9,9 @@ WORK=$(mktemp -d)
 trap 'rm -rf "$WORK"' EXIT
 cp -R "$ROOT/site/." "$WORK/"
 touch "$WORK/.nojekyll"   # serve files as they are, no Jekyll processing
+# Pages lets browsers cache files for 10 minutes; a versioned stylesheet link keeps a new page from being
+# shown with the previous site.css.
+sed -i '' "s|href=\"site.css\"|href=\"site.css?v=$SOURCE\"|" "$WORK"/*.html
 cd "$WORK"
 git init -q -b gh-pages
 git add -A

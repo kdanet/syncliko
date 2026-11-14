@@ -396,6 +396,13 @@ h1 .line { display: block; }
 /* Long-press: the photo stays full screen and dims slightly under the finger, then the toolbar appears. */
 .shot.on { filter: brightness(0.94); }
 .p-status .cam { z-index: 8; }
+/* The viewer's kitten blinks and sways its tail, only while the photo is open; .demo.paused stops it too. */
+@media (prefers-reduced-motion: no-preference) {
+  .viewer.open .kitty-tail { transform-box: view-box; transform-origin: 41px 53px; animation: kitty-tail 3s ease-in-out infinite; }
+  .viewer.open .kitty-eyes { transform-box: view-box; transform-origin: 30px 31px; animation: kitty-blink 4.2s infinite; }
+}
+@keyframes kitty-tail { 50% { transform: rotate(10deg); } }
+@keyframes kitty-blink { 0%, 90%, 98%, 100% { transform: scaleY(1); } 94% { transform: scaleY(0.15); } }
 .gesture { position: relative; z-index: 8; transition: background 0.3s ease; }
 /* Over a light photo the gesture bar turns dark, as Android does. */
 .phone-screen:has(.viewer.open) .gesture { background: #000; opacity: 0.35; }
@@ -597,21 +604,16 @@ kbd { font: 500 0.86em/1 var(--text); padding: 2px 5px 1px; border: 1px solid va
                 <linearGradient id="g-kbg" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#fdeedb"/><stop offset="1" stop-color="#f6c9a4"/></linearGradient>
                 <linearGradient id="g-sun" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb38a"/><stop offset="0.55" stop-color="#ff6f91"/><stop offset="1" stop-color="#6c5ce7"/></linearGradient>
                 <linearGradient id="g-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9fd2ff"/><stop offset="1" stop-color="#eaf6ff"/></linearGradient>
-                <!-- An abstract kitten: one warm capsule with two ears, dot eyes, a blush and a tail. It blinks
-                     and sways its tail (SMIL, paused for reduced motion by the scene script). -->
+                <!-- An abstract kitten: one warm capsule with two ears, dot eyes, a blush and a tail. The shared
+                     symbol is static: animating it would re-render every copy of it (gallery, chat) on each
+                     tick. Only the viewer's own copy moves (see .kitty in the CSS). -->
                 <symbol id="g-kitty-fg" viewBox="0 0 60 60">
                   <ellipse cx="30" cy="56.4" rx="12" ry="1.6" fill="#d48a5c" opacity="0.25"/>
-                  <path d="M41 53.4c6.6 0 9-5 6.8-10" fill="none" stroke="#f29a45" stroke-width="3.8" stroke-linecap="round">
-                    <animateTransform attributeName="transform" type="rotate" values="0 41 53;10 41 53;0 41 53" keyTimes="0;0.5;1" calcMode="spline" keySplines="0.45 0 0.55 1;0.45 0 0.55 1" dur="3s" repeatCount="indefinite"/>
-                  </path>
+                  <path d="M41 53.4c6.6 0 9-5 6.8-10" fill="none" stroke="#f29a45" stroke-width="3.8" stroke-linecap="round"/>
                   <path d="M18.6 28 19.6 14 27.8 21.4Z M41.4 28 40.4 14 32.2 21.4Z" fill="#f5a352" stroke="#f5a352" stroke-width="2.6" stroke-linejoin="round"/>
                   <rect x="16.5" y="19" width="27" height="37" rx="13.5" fill="#f5a352"/>
-                  <ellipse cx="25.2" cy="31" rx="1.75" ry="1.75" fill="#2b1a10">
-                    <animate attributeName="ry" values="1.75;1.75;0.25;1.75;1.75" keyTimes="0;0.9;0.94;0.98;1" dur="4.2s" repeatCount="indefinite"/>
-                  </ellipse>
-                  <ellipse cx="34.8" cy="31" rx="1.75" ry="1.75" fill="#2b1a10">
-                    <animate attributeName="ry" values="1.75;1.75;0.25;1.75;1.75" keyTimes="0;0.9;0.94;0.98;1" dur="4.2s" repeatCount="indefinite"/>
-                  </ellipse>
+                  <ellipse cx="25.2" cy="31" rx="1.75" ry="1.75" fill="#2b1a10"/>
+                  <ellipse cx="34.8" cy="31" rx="1.75" ry="1.75" fill="#2b1a10"/>
                   <circle cx="21.6" cy="35" r="2" fill="#ff8fa3" opacity="0.55"/><circle cx="38.4" cy="35" r="2" fill="#ff8fa3" opacity="0.55"/>
                   <path d="M29.1 33.6h1.8l-.9 1Z" fill="#e8707f" stroke="#e8707f" stroke-width="0.5" stroke-linejoin="round"/>
                 </symbol>
@@ -815,7 +817,7 @@ kbd { font: 500 0.86em/1 var(--text); padding: 2px 5px 1px; border: 1px solid va
                       <div class="gal-grid"><i class="tile"><svg viewBox="0 0 60 60"><use href="#g-peaks"/></svg></i><i class="tile"><svg viewBox="0 0 60 60"><use href="#g-duck"/></svg></i><i class="tile"><svg viewBox="0 0 60 60"><use href="#g-capy"/></svg></i><i class="tile"><svg viewBox="0 0 60 60"><use href="#g-chart"/></svg></i><i class="tile"><svg viewBox="0 0 60 60"><use href="#g-shiba"/></svg></i><i class="tile"><svg viewBox="0 0 60 60"><use href="#g-raccoon"/></svg></i></div>
                     </div>
                     <div class="viewer">
-                      <div class="shot" data-src="shot"><svg viewBox="0 0 60 60"><use href="#g-kitty-fg"/></svg></div>
+                      <div class="shot" data-src="shot"><svg class="kitty" viewBox="0 0 60 60" aria-hidden="true"><ellipse cx="30" cy="56.4" rx="12" ry="1.6" fill="#d48a5c" opacity="0.25"/><path class="kitty-tail" d="M41 53.4c6.6 0 9-5 6.8-10" fill="none" stroke="#f29a45" stroke-width="3.8" stroke-linecap="round"/><path d="M18.6 28 19.6 14 27.8 21.4Z M41.4 28 40.4 14 32.2 21.4Z" fill="#f5a352" stroke="#f5a352" stroke-width="2.6" stroke-linejoin="round"/><rect x="16.5" y="19" width="27" height="37" rx="13.5" fill="#f5a352"/><g class="kitty-eyes"><ellipse cx="25.2" cy="31" rx="1.75" ry="1.75" fill="#2b1a10"/><ellipse cx="34.8" cy="31" rx="1.75" ry="1.75" fill="#2b1a10"/></g><circle cx="21.6" cy="35" r="2" fill="#ff8fa3" opacity="0.55"/><circle cx="38.4" cy="35" r="2" fill="#ff8fa3" opacity="0.55"/><path d="M29.1 33.6h1.8l-.9 1Z" fill="#e8707f" stroke="#e8707f" stroke-width="0.5" stroke-linejoin="round"/></svg></div>
                     </div>
                   </div>
                   <div class="app" data-app="sms">
@@ -1064,12 +1066,14 @@ if (!/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)) {
   void flip.offsetWidth;
   flip.classList.add('anim');
 
-  var visible = true;
+  var visible = true, lastScroll = 0;
   if ('IntersectionObserver' in window) {
     new IntersectionObserver(function (es) { visible = es[0].isIntersecting; }).observe(h1);
   }
+  // Like the scene, the headline doesn't change while the page is being scrolled.
+  window.addEventListener('scroll', function () { lastScroll = Date.now(); }, { passive: true });
   setInterval(function () {
-    if (visible && !document.hidden && !reduce.matches) swap();
+    if (visible && !document.hidden && !reduce.matches && Date.now() - lastScroll > 400) swap();
   }, 4200);
 })();
 
@@ -1177,9 +1181,18 @@ if (!/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)) {
       var cipherInk = cs.getPropertyValue('--stream-cipher').trim() || '#8f98ea';
       var glow = cs.getPropertyValue('--stream-glow').trim() || 'rgba(74, 86, 209, 0.35)';
       return new Promise(function (done) {
-        var start = null;
+        var start = null, prev = null;
         function step(now) {
           if (start === null) start = now;
+          // While the page scrolls (or the scene is off screen) the bytes hold still: no drawing, and
+          // the clock is pushed back so the flight resumes from the same point.
+          if (freeze == null && halted()) {
+            if (prev !== null) start += now - prev;
+            prev = now;
+            requestAnimationFrame(step);
+            return;
+          }
+          prev = now;
           var t = freeze != null ? freeze : Math.min(1, (now - start) / ms);
           sctx.clearRect(0, 0, sceneEl.offsetWidth, sceneEl.offsetHeight);
           sctx.font = '500 ' + size + 'px ui-monospace, "SF Mono", Menlo, monospace';
@@ -1234,7 +1247,19 @@ if (!/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)) {
       overlay.style.top = Math.max(gap, top - overlay.offsetHeight - gap) + 'px';
     }
     function ping() { sy.classList.remove('ping'); void sy.offsetWidth; sy.classList.add('ping'); }
-    function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+    /* A delay that doesn't run while the scene is halted (scrolling, off screen, tab hidden), so a scene
+       pauses mid-step and carries on where it stopped. */
+    function wait(ms) {
+      return new Promise(function (resolve) {
+        var left = ms, last = performance.now();
+        (function tick() {
+          var now = performance.now();
+          if (!halted()) left -= now - last;
+          last = now;
+          if (left <= 0) resolve(); else setTimeout(tick, Math.min(left, 100));
+        })();
+      });
+    }
     /* Resolves when the element's open/switch transition has finished (or after a safety timeout), so
        the arc is measured on the settled layout, not on a window still growing out of the Dock. */
     function settled(el, max) {
@@ -1379,11 +1404,21 @@ if (!/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)) {
       flowBytes(sc.payload, rel(src), cv, 1, 0.55);
     }
 
-    var visible = true;
+    /* The scene halts while it's off screen, while the tab is hidden, and while the page is being
+       scrolled: its animation repaints most of the screen, and on phones doing that during a scroll
+       makes the scroll itself stutter. It resumes 300 ms after the scroll stops. */
+    var visible = true, scrolling = false, scrollTimer = 0;
+    function halted() { return scrolling || !visible || document.hidden; }
+    function syncPaused() { demo.classList.toggle('paused', halted()); }
     if ('IntersectionObserver' in window) {
-      new IntersectionObserver(function (es) { visible = es[0].isIntersecting; demo.classList.toggle('paused', !visible); }).observe(stage);
+      new IntersectionObserver(function (es) { visible = es[0].isIntersecting; syncPaused(); }).observe(stage);
     }
-    async function awake() { while (!visible || document.hidden) await wait(400); }
+    window.addEventListener('scroll', function () {
+      if (!scrolling) { scrolling = true; syncPaused(); }
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(function () { scrolling = false; syncPaused(); }, 300);
+    }, { passive: true });
+    async function awake() { while (halted()) await new Promise(function (r) { setTimeout(r, 150); }); }
     async function loop() {
       for (var i = 0; ; i = (i + 1) % SCENES.length) {
         await awake();
@@ -1394,8 +1429,6 @@ if (!/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)) {
 
     var started = false;
     function begin() {
-      // The kitten's blink and tail are SMIL animations: stop them along with everything else.
-      stage.querySelectorAll('svg').forEach(function (el) { if (el.pauseAnimations) { if (reduce.matches) el.pauseAnimations(); else el.unpauseAnimations(); } });
       if (reduce.matches) { still(); return; }
       if (!started) { started = true; loop(); }
     }

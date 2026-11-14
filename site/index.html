@@ -540,14 +540,20 @@ kbd { font: 500 0.86em/1 var(--text); padding: 2px 5px 1px; border: 1px solid va
 
 /* Install */
 .install .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 28px; }
-@media (max-width: 760px) { .install .grid { grid-template-columns: 1fr; } }
-.platform { border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; background: var(--raised); display: flex; flex-direction: column; gap: 14px; }
+
+/* Both cards share the grid's rows (title, steps, buttons, note) through subgrid, so the buttons line up
+   whatever the length of each card's steps. */
+.install .grid { grid-template-rows: auto 1fr auto auto; row-gap: 0; }
+.platform { border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; background: var(--raised);
+  display: grid; grid-row: span 4; grid-template-rows: subgrid; row-gap: 14px; }
 .platform ol { margin: 0; padding-left: 1.2em; color: var(--muted); }
 .platform li { margin-bottom: 8px; padding-left: 4px; }
-.platform .req { margin-top: auto; font: 400 0.76rem/1.5 var(--mono); color: var(--muted); }
-.platform .btn { align-self: flex-start; }
-.platform .btn-row { display: flex; flex-wrap: wrap; gap: 10px; }
-.platform .note { margin: -4px 0 0; font-size: var(--step--1); color: var(--muted); }
+.platform .btn-row { display: flex; flex-wrap: wrap; gap: 10px; align-self: end; }
+.platform .note { margin: 0; font-size: var(--step--1); color: var(--muted); }
+@media (max-width: 760px) {
+  .install .grid { grid-template-columns: 1fr; grid-template-rows: none; row-gap: 16px; }
+  .platform { grid-row: auto; grid-template-rows: auto; }
+}
 .install .fine { margin-top: 18px; }
 
 </style>
@@ -932,8 +938,11 @@ adb shell appops set com.syncliko.android SYSTEM_ALERT_WINDOW allow</pre>
             <li>Click the Syncliko icon in the menu bar, then Add Device to show a QR code.</li>
             <li>In Privacy &amp; Security → Paste from Other Apps, set Syncliko to Always Allow.</li>
           </ol>
-          <span class="req">macOS 26+ · Apple silicon · v0.3.2 · 3.2 MB</span>
-          <a class="btn primary" href="https://github.com/kdanet/syncliko/releases/latest/download/Syncliko.dmg"><span class="os-icon apple" aria-hidden="true">&#xF8FF;</span><svg class="os-icon mac-fallback" viewBox="0 0 24 24" width="20" height="20" style="display:none" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" d="M4.5 6.5a1.5 1.5 0 0 1 1.5-1.5h12a1.5 1.5 0 0 1 1.5 1.5V16h-15ZM2.5 18.5h19"/></svg>Download for Mac</a>
+          <div class="btn-row">
+            <a class="btn primary" href="https://github.com/kdanet/syncliko/releases/latest/download/Syncliko.dmg"><span class="os-icon apple" aria-hidden="true">&#xF8FF;</span><svg class="os-icon mac-fallback" viewBox="0 0 24 24" width="20" height="20" style="display:none" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" d="M4.5 6.5a1.5 1.5 0 0 1 1.5-1.5h12a1.5 1.5 0 0 1 1.5 1.5V16h-15ZM2.5 18.5h19"/></svg>Download for Mac</a>
+            <a class="btn" href="https://github.com/kdanet/syncliko/releases" rel="noopener">All releases</a>
+          </div>
+          <p class="note">Syncliko checks for new versions and offers them in its menu.</p>
         </div>
         <div class="platform">
           <h3>Android</h3>
@@ -943,7 +952,6 @@ adb shell appops set com.syncliko.android SYSTEM_ALERT_WINDOW allow</pre>
             <li>Allow local network access, notifications and unrestricted battery use.</li>
             <li>Turn on Standard in Accessibility settings. If it’s greyed out, open App info → ⋮ → Allow restricted settings first. Or set up Pro over ADB.</li>
           </ol>
-          <span class="req">Android 12+ · One UI, HyperOS, ColorOS, OxygenOS, Pixel · v0.3.2 · 4.0 MB</span>
           <div class="btn-row">
             <a class="btn primary" href="https://github.com/kdanet/syncliko/releases/latest/download/Syncliko.apk"><svg class="os-icon android" viewBox="3 7.2 18 11" width="24" height="15" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M3.5 18a8.5 8.5 0 0 1 17 0Z M9.6 14.2a1.1 1.1 0 1 1-2.2 0a1.1 1.1 0 1 1 2.2 0Z M16.6 14.2a1.1 1.1 0 1 1-2.2 0a1.1 1.1 0 1 1 2.2 0Z"/><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M7.4 11.2 5.7 8.3M16.6 11.2l1.7-2.9"/></svg>Download APK</a>
             <a class="btn" href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/kdanet/syncliko" rel="noopener">Add to Obtainium</a>

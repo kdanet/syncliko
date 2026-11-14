@@ -110,6 +110,6 @@ footer .wrap { display: flex; justify-content: space-between; align-items: cente
 /* Platform icons in download buttons. The Mac one is the Apple glyph; where the font lacks it, the page's
    script shows a laptop instead. The SVGs also carry width and height, so they stay small without this file. */
 .btn .os-icon { flex: none; width: 1.2em; height: 1.2em; display: block; }
-.btn .apple { width: auto; height: auto; font: 400 1.25em/1 -apple-system, BlinkMacSystemFont, sans-serif; transform: translateY(-0.06em); }
+.btn .apple { width: auto; height: auto; font: 400 1.25em/0.8 -apple-system, BlinkMacSystemFont, sans-serif; transform: translateY(-0.06em); }
 .btn .android { width: 1.5em; height: 0.92em; }
 

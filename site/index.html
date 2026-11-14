@@ -37,17 +37,18 @@
   --map: #e8ebf2; --road: #ffffff; --park: #d5ecd9;
   --stream-plain: #2f3ab8; --stream-cipher: #8f98ea; --stream-glow: rgba(74, 86, 209, 0.35); --spill: rgba(74, 86, 209, 0.2);
   --tl-r: #ff5f57; --tl-y: #febc2e; --tl-g: #28c840;         /* window buttons, same in both themes */
+  --gh-bg: #ffffff; --gh-card: #f6f8fa; --gh-edge: #d1d9e0; --gh-ink: #1f2328; --gh-muted: #59636e; --gh-field: #ffffff; --gh-btn: #1f883d; --gh-ok: #1a7f37;   /* GitHub's own light and dark palettes */
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --toolbar: #2a2c3a; --bezel: #2c2e3c; --wall: #232534;
-   --glass: #050608; --alu-hi: #4a4d5a; --alu-lo: #2b2d37; --wall-1: #5b66d6; --wall-2: #232a6e; --wall-3: #141633; --mbar: rgba(22, 24, 34, 0.6); --mbar-ink: #eceef6; --side: #20222e; --note-sel: #6a5717; --win-edge: rgba(255, 255, 255, 0.1); --grid: rgba(255, 255, 255, 0.045); --map: #1b1d26; --road: #2b2e3a; --park: #1d2b24; --stream-plain: #eef0ff; --stream-cipher: #8f9bff; --stream-glow: rgba(140, 150, 255, 0.9); --spill: rgba(100, 110, 255, 0.45);
+   --glass: #050608; --alu-hi: #4a4d5a; --alu-lo: #2b2d37; --wall-1: #5b66d6; --wall-2: #232a6e; --wall-3: #141633; --mbar: rgba(22, 24, 34, 0.6); --mbar-ink: #eceef6; --side: #20222e; --note-sel: #6a5717; --win-edge: rgba(255, 255, 255, 0.1); --grid: rgba(255, 255, 255, 0.045); --map: #1b1d26; --road: #2b2e3a; --park: #1d2b24; --stream-plain: #eef0ff; --stream-cipher: #8f9bff; --stream-glow: rgba(140, 150, 255, 0.9); --spill: rgba(100, 110, 255, 0.45); --gh-bg: #0d1117; --gh-card: #151b23; --gh-edge: #3d444d; --gh-ink: #f0f6fc; --gh-muted: #9198a1; --gh-field: #0d1117; --gh-btn: #238636; --gh-ok: #3fb950;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --toolbar: #2a2c3a; --bezel: #2c2e3c; --wall: #232534;
-   --glass: #050608; --alu-hi: #4a4d5a; --alu-lo: #2b2d37; --wall-1: #5b66d6; --wall-2: #232a6e; --wall-3: #141633; --mbar: rgba(22, 24, 34, 0.6); --mbar-ink: #eceef6; --side: #20222e; --note-sel: #6a5717; --win-edge: rgba(255, 255, 255, 0.1); --grid: rgba(255, 255, 255, 0.045); --map: #1b1d26; --road: #2b2e3a; --park: #1d2b24; --stream-plain: #eef0ff; --stream-cipher: #8f9bff; --stream-glow: rgba(140, 150, 255, 0.9); --spill: rgba(100, 110, 255, 0.45);
+   --glass: #050608; --alu-hi: #4a4d5a; --alu-lo: #2b2d37; --wall-1: #5b66d6; --wall-2: #232a6e; --wall-3: #141633; --mbar: rgba(22, 24, 34, 0.6); --mbar-ink: #eceef6; --side: #20222e; --note-sel: #6a5717; --win-edge: rgba(255, 255, 255, 0.1); --grid: rgba(255, 255, 255, 0.045); --map: #1b1d26; --road: #2b2e3a; --park: #1d2b24; --stream-plain: #eef0ff; --stream-cipher: #8f9bff; --stream-glow: rgba(140, 150, 255, 0.9); --spill: rgba(100, 110, 255, 0.45); --gh-bg: #0d1117; --gh-card: #151b23; --gh-edge: #3d444d; --gh-ink: #f0f6fc; --gh-muted: #9198a1; --gh-field: #0d1117; --gh-btn: #238636; --gh-ok: #3fb950;
   color-scheme: dark;
 }
 
@@ -432,6 +433,23 @@ h1 .line { display: block; }
 .wfield { display: flex; align-items: center; gap: 0.6em; width: 13em; height: 2.2em; margin-top: 0.4em; padding: 0 0.8em; border: 1px solid var(--line); border-radius: 0.5em; font: 500 0.9em/1 var(--mono); color: var(--muted); }
 .wfield .val { color: var(--ink); }
 .okline { font-size: 0.82em; font-weight: 600; color: var(--signal); }
+/* GitHub's two-factor page: the mark, the heading and the code form in a card, in GitHub's own colours.
+   GitHub submits as soon as six digits are in, so the button turns into the result. */
+.w-gh { background: var(--gh-bg); }
+.w-gh .wbar .url { background: var(--gh-card); color: var(--gh-muted); }
+.gh-body { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; gap: 0.75em; padding: 0.2em 1.6em 1em; font-size: 0.86em; color: var(--gh-ink); }
+.gh-mark { width: 2.5em; height: 2.5em; fill: var(--gh-ink); }
+.gh-body h6 { margin: 0; font: 400 1.3em/1.2 var(--text); letter-spacing: -0.01em; color: var(--gh-ink); }
+.gh-card { width: 17em; display: flex; flex-direction: column; gap: 0.6em; padding: 1em; border: 1px solid var(--gh-edge); border-radius: 0.45em; background: var(--gh-card); }
+.gh-card .gh-dev { display: flex; align-items: center; gap: 0.5em; font-weight: 600; font-size: 0.86em; }
+.gh-card .gh-dev svg { width: 1.2em; height: 1.2em; fill: var(--gh-muted); }
+.gh-card label { font-weight: 600; font-size: 0.82em; }
+.gh-input { display: flex; align-items: center; height: 2.3em; padding: 0 0.7em; border: 1px solid var(--gh-edge); border-radius: 0.4em; background: var(--gh-field); font: 500 1em/1 var(--mono); letter-spacing: 0.12em; }
+.gh-input .ph { color: var(--gh-muted); opacity: 0.6; }
+.gh-btn { display: flex; align-items: center; justify-content: center; gap: 0.4em; height: 2.3em; border-radius: 0.4em; background: var(--gh-btn); color: #fff; font-weight: 600; font-size: 0.9em; }
+.gh-btn svg { width: 1.05em; height: 1.05em; fill: currentColor; }
+.gh-btn .ok { display: inline-flex; align-items: center; gap: 0.4em; }
+.gh-note { font-size: 0.72em; line-height: 1.45; color: var(--gh-muted); }
 /* A bank's sign-in page: the bank's own header bar, a code form and the customer's card. The bank is made
    up (Meridian) so the page doesn't borrow a real bank's brand. */
 .w-bank .wbar { padding-bottom: 0.6em; }
@@ -657,7 +675,7 @@ kbd { font: 500 0.86em/1 var(--text); padding: 2px 5px 1px; border: 1px solid va
 
       <div class="demo v-dark v-spot">
         <p class="case" aria-hidden="true" data-id="link"><span class="c-lead"><span class="w" style="--i:0">A</span> <span class="w" style="--i:1">link</span> <span class="w" style="--i:2">from</span> <span class="w" style="--i:3">a</span> <span class="w" style="--i:4">chat,</span></span> <span class="c-rest"><span class="w" style="--i:5">pasted</span> <span class="w" style="--i:6">into</span> <span class="w" style="--i:7">Notes.</span></span></p>
-        <div class="stage" role="img" aria-label="Five scenes cycle between an Android phone and a MacBook: a link from a chat pasted into Notes, an address copied on the Mac pasted into a ride app, an authenticator code typed into a sign-in page, a kitten picked from the phone's gallery and pasted into a team chat, and an SMS code pasted into a bank sign-in">
+        <div class="stage" role="img" aria-label="Five scenes cycle between an Android phone and a MacBook: a link from a chat pasted into Notes, an address copied on the Mac pasted into a ride app, an authenticator code pasted into GitHub's two-factor sign-in, a kitten picked from the phone's gallery and pasted into a team chat, and an SMS code pasted into a bank sign-in">
           <div class="scene" aria-hidden="true">
 <svg class="defs" aria-hidden="true" width="0" height="0">
               <defs>
@@ -791,14 +809,17 @@ kbd { font: 500 0.86em/1 var(--text); padding: 2px 5px 1px; border: 1px solid va
                     <span>+7 495 000-00-00</span>
                   </div>
                 </div>
-                <div class="win w-web" data-app="twofa">
-                  <div class="wbar"><div class="lights"><i></i><i></i><i></i></div><span class="url">id.example.com</span></div>
-                  <div class="wbody center">
-                    <i class="logo"></i>
-                    <h6>Two-step verification</h6>
-                    <span class="muted">Enter the 6-digit code from your authenticator app.</span>
-                    <span class="otp" data-dst="totp"><i><span class="val" data-fill="totp">4</span></i><i><span class="val" data-fill="totp">8</span></i><i><span class="val" data-fill="totp">2</span></i><i><span class="val" data-fill="totp">9</span></i><i><span class="val" data-fill="totp">1</span></i><i><span class="val" data-fill="totp">3</span></i></span>
-                    <span class="okline ok" data-fill="totp">✓ Signed in</span>
+                <div class="win w-web w-gh" data-app="twofa">
+                  <div class="wbar"><div class="lights"><i></i><i></i><i></i></div><span class="url">github.com</span></div>
+                  <div class="gh-body">
+                    <svg class="gh-mark" viewBox="0 0 24 24"><path d="M12.5.75C6.146.75 1 5.896 1 12.25c0 5.089 3.292 9.387 7.863 10.91.575.101.79-.244.79-.546 0-.273-.014-1.178-.014-2.142-2.889.532-3.636-.704-3.866-1.35-.13-.331-.69-1.352-1.18-1.625-.402-.216-.977-.748-.014-.762.906-.014 1.553.834 1.769 1.179 1.035 1.74 2.688 1.25 3.349.948.1-.747.402-1.25.733-1.538-2.559-.287-5.232-1.279-5.232-5.678 0-1.25.445-2.285 1.178-3.09-.115-.288-.517-1.467.115-3.048 0 0 .963-.302 3.163 1.179.92-.259 1.897-.388 2.875-.388.977 0 1.955.13 2.875.388 2.2-1.495 3.162-1.179 3.162-1.179.633 1.581.23 2.76.115 3.048.733.805 1.179 1.825 1.179 3.09 0 4.413-2.688 5.39-5.247 5.678.417.36.776 1.05.776 2.128 0 1.538-.014 2.774-.014 3.162 0 .302.216.662.79.547C20.709 21.637 24 17.324 24 12.25 24 5.896 18.854.75 12.5.75Z"/></svg>
+                    <h6>Two-factor authentication</h6>
+                    <div class="gh-card">
+                      <span class="gh-dev"><svg viewBox="0 0 16 16"><path d="M3.75 0h8.5C13.216 0 14 .784 14 1.75v12.5A1.75 1.75 0 0 1 12.25 16h-8.5A1.75 1.75 0 0 1 2 14.25V1.75C2 .784 2.784 0 3.75 0ZM3.5 1.75v12.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25V1.75a.25.25 0 0 0-.25-.25h-8.5a.25.25 0 0 0-.25.25ZM8 13a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"/></svg>Authentication code</span>
+                      <span class="gh-input" data-dst="totp"><span class="ph" data-fill="totp">XXXXXX</span><span class="val" data-fill="totp">482913</span></span>
+                      <span class="gh-btn"><span class="ph" data-fill="totp">Verify</span><span class="ok" data-fill="totp"><svg viewBox="0 0 16 16"><path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-.018-1.042.751.751 0 0 0-1.042-.018L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.042.018.751.751 0 0 0-.018 1.042l2 2a.75.75 0 0 0 1.06 0Z"/></svg>Signed in</span></span>
+                      <span class="gh-note">Open your two-factor authenticator (TOTP) app or browser extension to view your authentication code.</span>
+                    </div>
                   </div>
                 </div>
                 <div class="win w-chat" data-app="chat">
@@ -889,7 +910,7 @@ kbd { font: 500 0.86em/1 var(--text); padding: 2px 5px 1px; border: 1px solid va
                   </div>
                   <div class="app" data-app="auth">
                     <b class="a-head">Authenticator</b>
-                    <div class="acct"><span><small>id.example.com</small><span class="code tap" data-src="totp">482 913</span></span><i class="ring"></i></div>
+                    <div class="acct"><span><small>GitHub · lena-dev</small><span class="code tap" data-src="totp">482 913</span></span><i class="ring"></i></div>
                     <div class="acct"><span><small>Cloud storage</small><span class="code">903 118</span></span><i class="ring"></i></div>
                     <div class="acct"><span><small>Work email</small><span class="code">250 671</span></span><i class="ring"></i></div>
                     <div class="acct"><span><small>Domain registrar</small><span class="code">618 044</span></span><i class="ring"></i></div>
@@ -1203,7 +1224,7 @@ if (!/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)) {
     var SCENES = [
       { id: 'link', lead: 'A link from a chat,', rest: 'pasted into Notes.', dir: 'a2m', phone: 'msg', mac: 'notes', app: 'Notes', dock: 'notes', copy: 'select', payload: 'table.io/r/8KX2-Q4' },
       { id: 'addr', lead: 'An address on the Mac,', rest: 'pasted into a ride.', dir: 'm2a', phone: 'taxi', mac: 'place', app: 'Safari', dock: 'web', copy: 'cmdc', payload: 'Pokrovka St 17, Moscow' },
-      { id: 'totp', lead: 'An authenticator code,', rest: 'pasted into a sign-in.', dir: 'a2m', phone: 'auth', mac: 'twofa', app: 'Safari', dock: 'web', copy: 'tap', payload: '482913' },
+      { id: 'totp', lead: 'An authenticator code,', rest: 'pasted into GitHub.', dir: 'a2m', phone: 'auth', mac: 'twofa', app: 'Safari', dock: 'web', copy: 'tap', payload: '482913' },
       { id: 'shot', lead: 'A kitten from the gallery,', rest: 'pasted into the team chat.', dir: 'a2m', phone: 'photo', mac: 'chat', app: 'Chat', dock: 'chat', copy: 'select', pre: 'gallery', payload: JPEG },
       { id: 'sms', lead: 'A code from an SMS,', rest: 'pasted into the bank.', dir: 'a2m', phone: 'sms', mac: 'bank', app: 'Safari', dock: 'web', copy: 'select', payload: '739204' }
     ];

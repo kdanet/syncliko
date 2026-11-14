@@ -299,6 +299,45 @@ h1 .line { display: block; }
 }
 @keyframes blink { 50% { visibility: hidden; } }
 
+/* The personal iPhone (receipt scene only): Dynamic Island, the Photos viewer on black with the
+   receipt, and iOS's long-press menu. It stands right of the MacBook, which steps back a little. */
+.iphone {
+  position: absolute; left: 79.5%; width: 18%; top: 14%; bottom: 0; z-index: 3;
+  padding: 0.24em; border-radius: 2.1em;
+  background: linear-gradient(150deg, #8d8f96 0%, #2c2d32 30%, #3e4047 72%, #74767e 100%);
+  box-shadow: 0 2.4em 3.4em -1.8em rgba(10, 12, 30, 0.55);
+}
+.ip-screen { position: relative; height: 100%; border: 0.18em solid #040406; border-radius: 1.86em; background: #000; display: flex; flex-direction: column; overflow: hidden; color: #f2f2f7; }
+.ip-island { position: absolute; left: 50%; top: 0.5em; width: 4.4em; height: 1.25em; margin-left: -2.2em; border-radius: 1em; background: #000; z-index: 4; box-shadow: 0 0 0 1px #111; }
+.ip-status { display: flex; justify-content: space-between; align-items: center; padding: 0.75em 1.4em 0.3em; font: 600 0.72em/1 var(--text); }
+.ip-status .bat { width: 1.7em; height: 0.85em; }
+.ip-bar { display: flex; justify-content: space-between; align-items: center; padding: 0.6em 0.9em; font-size: 0.7em; color: #0a84ff; }
+.ip-bar b { color: #f2f2f7; text-align: center; font-size: 0.95em; }
+.ip-bar small { display: block; font-weight: 400; font-size: 0.85em; color: #8e8e93; }
+.ip-photo { flex: 1; min-height: 0; display: grid; place-items: center; background: radial-gradient(60% 50% at 50% 50%, #5a4632, #2a2118); transition: transform 0.25s ease; }
+.ip-photo svg { width: 64%; transform: rotate(-4deg); filter: drop-shadow(0 0.4em 0.6em rgba(0, 0, 0, 0.5)); }
+.ip-photo.on { transform: scale(0.96); }
+.ip-tools { display: flex; justify-content: space-around; padding: 0.7em 0.5em 0.2em; font-size: 0.8em; color: #0a84ff; }
+.ip-home { flex: none; width: 34%; height: 0.24em; margin: 0.4em auto 0.5em; border-radius: 1em; background: #f2f2f7; opacity: 0.7; }
+.ip-menu {
+  position: absolute; left: 12%; right: 12%; top: 58%; z-index: 5; display: flex; flex-direction: column;
+  border-radius: 0.9em; overflow: hidden; background: rgba(44, 44, 46, 0.97); font-size: 0.68em;
+  opacity: 0; transform: scale(0.85); transform-origin: 50% 0; transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.2, 1.3, 0.4, 1);
+}
+.ip-menu.show { opacity: 1; transform: none; }
+.ip-menu span { display: flex; justify-content: space-between; padding: 0.65em 0.9em; }
+.ip-menu span + span { border-top: 1px solid rgba(255, 255, 255, 0.12); }
+.ip-menu i { font-style: normal; color: #8e8e93; }
+.ip-menu.pressed .copy { background: rgba(255, 255, 255, 0.16); }
+/* "Work" and "Personal" over the two phones, in the receipt scene only. */
+.dev-tag { position: absolute; left: 50%; bottom: calc(100% + 0.8em); transform: translateX(-50%); font-size: 0.7em; padding: 0.45em 0.8em; white-space: nowrap; opacity: 0; transition: opacity 0.5s ease; }
+.iphone .dev-tag { background: #f1e9ff; color: #6d28d9; }
+.scene.tri .dev-tag { opacity: 1; transition-delay: 0.6s; }
+/* The MacBook steps back for the iPhone: a bit smaller, bottom edge on the same floor. */
+.laptop, .phone { transition: transform 1s cubic-bezier(0.65, 0, 0.35, 1); }
+.laptop { transform-origin: 0 100%; }
+.scene.tri .laptop { transform: translateX(-7.3%) scale(0.75); }
+
 /* Scene extras switched on by the hero look below. */
 .ripple, .floor, .stream { display: none; }
 .stream { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; }
@@ -322,12 +361,12 @@ h1 .line { display: block; }
 .v-spot .stage { margin-bottom: 2.2em; }
 .v-spot .laptop { -webkit-box-reflect: below 0.4em linear-gradient(transparent 88%, rgba(255, 255, 255, 0.16)); }
 .v-spot .laptop::before { content: ""; position: absolute; left: 10%; right: 10%; top: 30%; bottom: -14%; z-index: -1; background: radial-gradient(closest-side, var(--spill), transparent); filter: blur(28px); }
-.v-spot .phone { -webkit-box-reflect: below 0.4em linear-gradient(transparent 90%, rgba(255, 255, 255, 0.14)); }
+.v-spot .phone, .v-spot .iphone { -webkit-box-reflect: below 0.4em linear-gradient(transparent 90%, rgba(255, 255, 255, 0.14)); }
 .v-spot .stream { display: block; }
 
 
 /* ---------- Scenario playlist ----------
-   Six scenes share one phone and one MacBook. Phone apps switch like Android does (the old one slides
+   Seven scenes share one phone and one MacBook. Phone apps switch like Android does (the old one slides
    up, the next rises in); Mac windows minimise into the Dock and the next one opens out of it. */
 .apps { position: relative; flex: 1; min-height: 0; }
 /* Inactive apps, windows and the photo viewer turn visibility: hidden once their exit animation is over
@@ -389,6 +428,24 @@ h1 .line { display: block; }
 .player span { flex: 1; min-width: 0; }
 .player small { display: block; font-size: 0.9em; }
 .player em { font-style: normal; font-size: 1.3em; }
+
+/* Phone: the work expense app (a work-profile app, hence the briefcase), where the receipt lands. */
+.app-exp { padding: 0.4em 0.8em 0.7em; gap: 0.5em; color: var(--ink); }
+.x-top { display: flex; justify-content: space-between; align-items: center; padding-top: 0.2em; }
+.x-top b { font: 700 1.05em/1.2 var(--text); }
+.x-work, .dev-tag { display: inline-flex; align-items: center; gap: 0.35em; padding: 0.3em 0.6em; border-radius: 999px; background: #e8f0ff; color: #1d4ed8; font: 600 0.58em/1 var(--text); }
+.x-work svg, .dev-tag svg { width: 1.15em; height: 1.15em; fill: none; stroke: currentColor; stroke-width: 2; }
+.x-lbl { font-size: 0.62em; font-weight: 600; color: var(--muted); }
+.x-card { display: flex; flex-direction: column; border-radius: 0.8em; background: var(--code-bg); font-size: 0.7em; }
+.x-row { display: flex; justify-content: space-between; gap: 0.6em; padding: 0.6em 0.75em; }
+.x-row + .x-row { border-top: 1px solid var(--line); }
+.x-row em { font-style: normal; color: var(--muted); }
+.x-row .ph { color: var(--muted); }
+.x-drop { display: flex; align-items: center; justify-content: center; min-height: 3.4em; padding: 0.4em; border: 1.5px dashed var(--line); border-radius: 0.8em; font-size: 0.68em; color: var(--accent); font-weight: 600; }
+.x-file { display: flex; align-items: center; gap: 0.6em; color: var(--ink); font-weight: 500; }
+.x-file svg { width: 1.9em; height: 2.5em; border-radius: 0.2em; background: #3b3427; padding: 0.15em; }
+.x-btn { height: 2.3em; display: grid; place-items: center; border-radius: 1.15em; background: var(--accent); color: var(--paper); font: 600 0.72em/1 var(--text); }
+.app-exp .x-ok:not([hidden]) { animation: rise 0.45s ease 0.9s backwards; text-align: center; }
 
 /* Phone: authenticator */
 .a-head { padding: 0.5em 0.9em 0.7em; font: 700 1em/1.2 var(--text); color: var(--ink); }
@@ -524,6 +581,25 @@ h1 .line { display: block; }
 .pw-fields .site-link { color: var(--accent); }
 .pw-note { color: var(--muted); font-size: 0.85em; }
 
+/* Syncliko's menu under the S in the menu bar, as the Mac app draws it: what went through the Mac. */
+.sy-pop {
+  position: absolute; z-index: 3; top: 2.6em; right: 9.5em; width: 15em;
+  display: flex; flex-direction: column; gap: 0.55em; padding: 0.8em; border-radius: 0.9em;
+  background: var(--raised); box-shadow: 0 0 0 1px var(--win-edge), 0 1.4em 2.6em -1em rgba(10, 12, 30, 0.5);
+  font-size: 0.72em; color: var(--ink);
+  opacity: 0; transform: translateY(-0.4em) scale(0.97); transform-origin: 80% 0; visibility: hidden;
+  transition: opacity 0.25s ease, transform 0.25s ease, visibility 0s linear 0.25s;
+}
+.sy-pop.show { opacity: 1; transform: none; visibility: visible; transition: opacity 0.25s ease, transform 0.25s ease, visibility 0s; }
+.sp-head { display: flex; justify-content: space-between; align-items: center; }
+.sp-head i { width: 2em; height: 1.1em; border-radius: 999px; background: var(--signal); }
+.sp-item { display: flex; align-items: center; gap: 0.7em; padding: 0.5em; border-radius: 0.6em; background: var(--code-bg); }
+.sp-item svg { width: 2.2em; height: 2.9em; flex: none; border-radius: 0.25em; background: #3b3427; padding: 0.15em; }
+.sp-item b { display: block; }
+.sp-item small { display: block; font-size: 0.85em; color: var(--muted); }
+.sp-sent { font-weight: 600; color: var(--signal); padding-left: 0.2em; opacity: 0; transition: opacity 0.3s ease; }
+.sy-pop.sent .sp-sent { opacity: 1; }
+
 /* A team chat: workspace sidebar (channels with an unread count, people with presence), the channel's
    header, a feed with avatars and times, and the composer. After the paste the kitten is posted and the
    team reacts (see chatReplies in the script). */
@@ -611,7 +687,11 @@ h1 .line { display: block; }
   .scene { inset: 0 auto auto 0; width: 148cqw; height: 88cqw; font-size: 1.99cqw; transform-origin: 0 0; }
   .laptop { left: 35.14%; width: 62.16%; top: auto; bottom: 2%; height: 71.4%; }
   .phone { left: 2.7%; width: 27.03%; top: auto; bottom: 2%; height: 95.7%; font-size: 1.53em; }
-  .laptop, .phone { transition: opacity 0.9s ease; }
+  .laptop, .phone, .iphone { transition: opacity 0.9s ease, transform 1s cubic-bezier(0.65, 0, 0.35, 1); }
+  .iphone { left: 102.5%; width: 25.7%; top: auto; bottom: 2%; height: 95.7%; font-size: 1.53em; }
+  .scene.tri .laptop { transform: none; }
+  .scene[data-focus="iphone"] .laptop, .scene[data-focus="iphone"] .phone,
+  .scene[data-focus="phone"] .iphone, .scene[data-focus="mac"] .iphone { opacity: 0.4; }
   .scene.cam { transition: transform 1s cubic-bezier(0.65, 0, 0.35, 1); }
   .scene[data-focus="phone"] .laptop, .scene[data-focus="mac"] .phone { opacity: 0.4; }
 }
@@ -754,9 +834,10 @@ kbd { font: 500 0.86em/1 var(--text); padding: 2px 5px 1px; border: 1px solid va
           <button type="button" data-case="3" aria-pressed="false">2FA</button>
           <button type="button" data-case="4" aria-pressed="false">Password</button>
           <button type="button" data-case="5" aria-pressed="false">SMS</button>
+          <button type="button" data-case="6" aria-pressed="false">Receipt</button>
         </div>
         <p class="case" aria-hidden="true" data-id="link"><span class="c-lead"><span class="w" style="--i:0">A</span> <span class="w" style="--i:1">link</span> <span class="w" style="--i:2">from</span> <span class="w" style="--i:3">a</span> <span class="w" style="--i:4">chat,</span></span> <span class="c-rest"><span class="w" style="--i:5">pasted</span> <span class="w" style="--i:6">into</span> <span class="w" style="--i:7">Notes.</span></span></p>
-        <div class="stage" role="img" aria-label="Six scenes cycle between an Android phone and a MacBook: a link from a chat pasted into Notes, an address copied on the Mac pasted into a ride app, an authenticator code pasted into GitHub's two-factor sign-in, a password copied from the Mac's Passwords app signing in to a music app on the phone, a kitten picked from the phone's gallery and pasted into a team chat, and an SMS code pasted into a bank sign-in">
+        <div class="stage" role="img" aria-label="Seven scenes cycle between an Android phone and a MacBook: a link from a chat pasted into Notes, an address copied on the Mac pasted into a ride app, an authenticator code pasted into GitHub's two-factor sign-in, a password copied from the Mac's Passwords app signing in to a music app on the phone, a kitten picked from the phone's gallery and pasted into a team chat, an SMS code pasted into a bank sign-in, and a receipt photo copied on a personal iPhone that reaches the Mac through Universal Clipboard and goes on to an expense app on the work Android phone">
           <div class="scene" aria-hidden="true">
 <svg class="defs" aria-hidden="true" width="0" height="0">
               <defs>
@@ -841,12 +922,30 @@ kbd { font: 500 0.86em/1 var(--text); padding: 2px 5px 1px; border: 1px solid va
                   <rect x="10" y="34" width="6" height="16" rx="1" fill="#fff" opacity="0.85"/><rect x="20" y="26" width="6" height="24" rx="1" fill="#fff" opacity="0.85"/>
                   <rect x="30" y="31" width="6" height="19" rx="1" fill="#fff" opacity="0.85"/><rect x="40" y="20" width="6" height="30" rx="1" fill="#fff" opacity="0.85"/>
                 </symbol>
+                <symbol id="g-receipt" viewBox="0 0 60 80">
+                  <path d="M6 4h48v68l-4-3-4 3-4-3-4 3-4-3-4 3-4-3-4 3-4-3-4 3-4-3-4 3Z" fill="#fbf8f1"/>
+                  <rect x="18" y="9" width="24" height="3.2" rx="1.6" fill="#2b2b2b"/>
+                  <rect x="22" y="15" width="16" height="1.8" rx="0.9" fill="#9a958a"/>
+                  <g fill="#6f6b62"><rect x="11" y="24" width="22" height="2" rx="1"/><rect x="41" y="24" width="8" height="2" rx="1"/><rect x="11" y="30" width="18" height="2" rx="1"/><rect x="41" y="30" width="8" height="2" rx="1"/><rect x="11" y="36" width="25" height="2" rx="1"/><rect x="41" y="36" width="8" height="2" rx="1"/><rect x="11" y="42" width="14" height="2" rx="1"/><rect x="41" y="42" width="8" height="2" rx="1"/></g>
+                  <rect x="11" y="49" width="38" height="0.8" fill="#bdb7aa"/>
+                  <text x="11" y="58" font-family="ui-monospace, Menlo, monospace" font-size="5.4" font-weight="700" fill="#2b2b2b">TOTAL</text>
+                  <text x="49" y="58" text-anchor="end" font-family="ui-monospace, Menlo, monospace" font-size="5.4" font-weight="700" fill="#2b2b2b">€48.60</text>
+                </symbol>
               </defs>
             </svg>
             <div class="laptop">
             <div class="lid">
               <div class="desk">
                 <i class="notch"></i>
+                <!-- Syncliko's own menu, as in the Mac app: what just went through the Mac. -->
+                <div class="sy-pop" aria-hidden="true">
+                  <span class="sp-head"><b>Syncliko</b><i></i></span>
+                  <span class="sp-item">
+                    <svg viewBox="0 0 60 80"><use href="#g-receipt"/></svg>
+                    <span><b>Photo</b><small>From iPhone · Universal Clipboard</small></span>
+                  </span>
+                  <span class="sp-sent">→ Sent to Work phone</span>
+                </div>
                 <div class="mbar">
                   <span class="apple" aria-hidden="true">&#xF8FF;</span>
                   <b>Notes</b>
@@ -993,6 +1092,7 @@ kbd { font: 500 0.86em/1 var(--text); padding: 2px 5px 1px; border: 1px solid va
             </div>
 
             <div class="phone">
+              <span class="dev-tag"><svg viewBox="0 0 24 24"><rect x="3.5" y="7.5" width="17" height="12" rx="2"/><path d="M9 7.5V6a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 6v1.5"/></svg>Work</span>
               <i class="floor"></i>
               <div class="phone-screen">
                 <div class="p-status"><span>19:24</span><i class="cam"></i><i class="bat"></i></div>
@@ -1016,6 +1116,18 @@ kbd { font: 500 0.86em/1 var(--text); padding: 2px 5px 1px; border: 1px solid va
                       <span class="recent">⌂&nbsp; Home · Lesnaya St 5</span>
                       <span class="recent">▣&nbsp; Work · Tverskaya St 12</span>
                     </div>
+                  </div>
+                  <div class="app app-exp" data-app="expense">
+                    <div class="x-top"><b>Expenses</b><span class="x-work"><svg viewBox="0 0 24 24"><rect x="3.5" y="7.5" width="17" height="12" rx="2"/><path d="M9 7.5V6a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 6v1.5"/></svg>Work</span></div>
+                    <span class="x-lbl">New expense</span>
+                    <div class="x-card">
+                      <span class="x-row"><em>Merchant</em><span class="ph" data-fill="rcpt">—</span><span class="val" data-fill="rcpt">Café Lisboa</span></span>
+                      <span class="x-row"><em>Amount</em><span class="ph" data-fill="rcpt">€0.00</span><span class="val" data-fill="rcpt">€48.60</span></span>
+                      <span class="x-row"><em>Category</em>Client meal</span>
+                    </div>
+                    <span class="x-drop" data-dst="rcpt"><span class="ph" data-fill="rcpt">＋ Attach receipt</span><span class="val x-file" data-fill="rcpt"><svg viewBox="0 0 60 80"><use href="#g-receipt"/></svg>receipt.jpg</span></span>
+                    <span class="x-btn">Submit</span>
+                    <span class="okchip ok x-ok" data-fill="rcpt">✓ Submitted for approval</span>
                   </div>
                   <div class="app app-music" data-app="music">
                     <i class="enc-logo"></i>
@@ -1062,6 +1174,20 @@ kbd { font: 500 0.86em/1 var(--text); padding: 2px 5px 1px; border: 1px solid va
                 <span class="p-paste">Paste</span>
                 <span class="p-toast">Copied to clipboard</span>
                 <i class="gesture"></i>
+              </div>
+            </div>
+
+            <!-- The personal iPhone, on stage only in the receipt scene. -->
+            <div class="iphone" hidden>
+              <span class="dev-tag">Personal</span>
+              <div class="ip-screen">
+                <i class="ip-island"></i>
+                <div class="ip-status"><span>19:24</span><i class="bat"></i></div>
+                <div class="ip-bar"><span>‹</span><b>Today<small>13:05</small></b><span>Edit</span></div>
+                <div class="ip-photo" data-src="rcpt"><svg viewBox="0 0 60 80"><use href="#g-receipt"/></svg></div>
+                <div class="ip-menu"><span class="copy">Copy<i>⧉</i></span><span>Share<i>⇪</i></span><span>Favorite<i>♡</i></span></div>
+                <div class="ip-tools"><span>⇪</span><span>♡</span><span>ⓘ</span><span>🗑</span></div>
+                <i class="ip-home"></i>
               </div>
             </div>
 
@@ -1351,7 +1477,8 @@ if (!/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)) {
       { id: 'addr', lead: 'An address on the Mac,', rest: 'pasted into a ride.', dir: 'm2a', phone: 'taxi', mac: 'place', app: 'Safari', dock: 'web', copy: 'cmdc', payload: 'Pokrovka St 17, Moscow' },
       { id: 'totp', lead: 'An authenticator code,', rest: 'pasted into GitHub.', dir: 'a2m', phone: 'auth', mac: 'twofa', app: 'Safari', dock: 'web', copy: 'tap', payload: '482913' },
       { id: 'pass', lead: 'A password from the Mac,', rest: 'pasted into a music app.', dir: 'm2a', phone: 'music', mac: 'pass', app: 'Passwords', dock: 'pass', copy: 'cmdc', secret: true, payload: 'Tq7#vR2m!kL9' },
-      { id: 'sms', lead: 'A code from an SMS,', rest: 'pasted into the bank.', dir: 'a2m', phone: 'sms', mac: 'bank', app: 'Safari', dock: 'web', copy: 'select', payload: '739204' }
+      { id: 'sms', lead: 'A code from an SMS,', rest: 'pasted into the bank.', dir: 'a2m', phone: 'sms', mac: 'bank', app: 'Safari', dock: 'web', copy: 'select', payload: '739204' },
+      { id: 'rcpt', lead: 'A receipt on your own iPhone,', rest: 'filed from the work phone.', dir: 'a2m', tri: true, phone: 'expense', mac: 'none', app: 'Finder', dock: 'none', payload: JPEG }
     ];
     var current = SCENES[0];
 
@@ -1487,7 +1614,7 @@ if (!/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)) {
        'both' (pulled back), 'phone' or 'mac', keeping the floor line where it is, and dims the device
        that is out of focus. ms sets how long the move takes. On wider screens the scene is static. */
     var narrow = window.matchMedia('(max-width: 640px)');
-    var laptopEl = q('.laptop'), phoneEl = q('.phone'), focusNow = 'both';
+    var laptopEl = q('.laptop'), phoneEl = q('.phone'), iphoneEl = q('.iphone'), focusNow = 'both', triOn = false;
     function box(el) { return { x: el.offsetLeft, y: el.offsetTop, w: el.offsetWidth, h: el.offsetHeight }; }
     function camera(focus, ms) {
       focusNow = focus;
@@ -1496,15 +1623,19 @@ if (!/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)) {
         return;
       }
       var W = stage.clientWidth, H = stage.clientHeight, m = W * 0.04;
-      var p = box(phoneEl), l = box(laptopEl), b, s, x;
+      var p = box(phoneEl), l = box(laptopEl), ip = triOn ? box(iphoneEl) : null, b, s, x;
       if (focus === 'phone') {
         b = p; s = Math.min(1, (H - m) / b.h);
         x = Math.max(m, W * 0.07);
+      } else if (focus === 'iphone') {
+        b = ip; s = Math.min(1, (H - m) / b.h);
+        x = W - Math.max(m, W * 0.07) - s * b.w;
       } else if (focus === 'mac') {
         b = l; s = Math.min(1, (W - 2 * m) / b.w, (H - m) / b.h);
         x = (W - s * b.w) / 2;
       } else {
-        b = { x: p.x, y: Math.min(p.y, l.y), w: l.x + l.w - p.x, h: Math.max(p.y + p.h, l.y + l.h) - Math.min(p.y, l.y) };
+        var right = ip ? ip.x + ip.w : l.x + l.w;
+        b = { x: p.x, y: Math.min(p.y, l.y), w: right - p.x, h: Math.max(p.y + p.h, l.y + l.h) - Math.min(p.y, l.y) };
         s = Math.min(1, (W - 2 * m) / b.w, (H - m) / b.h);
         x = (W - s * b.w) / 2;
       }
@@ -1516,6 +1647,48 @@ if (!/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)) {
       sceneEl.setAttribute('data-focus', focus);
     }
     if (narrow.addEventListener) narrow.addEventListener('change', function () { camera(focusNow, 0); });
+
+    /* The receipt scene: the personal iPhone joins the stage (the MacBook steps back for it on wide
+       screens), and the clip goes iPhone → the Mac's menu bar → the work phone, with Syncliko's menu
+       opening on the Mac to show what passed through. */
+    var syPop = q('.sy-pop'), ipMenu = q('.ip-menu');
+    function triLayout(on) {
+      triOn = on;
+      iphoneEl.hidden = !on;
+      sceneEl.classList.toggle('tri', on);
+      if (!on) { syPop.classList.remove('show', 'sent'); ipMenu.classList.remove('show', 'pressed'); }
+    }
+    function centre(r) { return { x: r.x + r.w / 2, y: r.y + r.h / 2 }; }
+    async function playTri(sc) {
+      var src = q('[data-src="' + sc.id + '"]'), dst = q('[data-dst="' + sc.id + '"]');
+      if (narrow.matches) { camera('iphone'); await wait(1000); }
+      // Long-press the photo on the iPhone, then Copy in iOS's menu.
+      src.classList.add('on');
+      await wait(450); ipMenu.classList.add('show');
+      await wait(750); ipMenu.classList.add('pressed');
+      await wait(260); ipMenu.classList.remove('show', 'pressed'); src.classList.remove('on');
+      // Hop one: Universal Clipboard brings it to the Mac (to the S in the menu bar).
+      var s1 = rel(src), sy1 = centre(rel(sy));
+      var a1 = { x: s1.x + s1.w / 2, y: s1.y + s1.h * 0.35 };
+      var cv1 = { a: a1, b: sy1, c: { x: (a1.x + sy1.x) / 2, y: Math.max(6, Math.min(a1.y, sy1.y) - 30) } };
+      if (narrow.matches) camera('mac', 1300);
+      await flowBytes(sc.payload, s1, cv1, 1300);
+      ping(); land(cv1);
+      syPop.classList.add('show');
+      await wait(900);
+      // Hop two: Syncliko sends it on to the work phone.
+      syPop.classList.add('sent');
+      var from = rel(sy), d = rel(dst), b2 = { x: d.x + Math.min(d.w * 0.3, 40), y: d.y + d.h / 2 }, a2 = centre(from);
+      var cv2 = { a: a2, b: b2, c: { x: (a2.x + b2.x) / 2, y: a2.y + (b2.y - a2.y) * 0.1 } };
+      if (narrow.matches) camera('phone', 1600);
+      await flowBytes(sc.payload, from, cv2, 1600);
+      land(cv2);
+      await wait(250); syPop.classList.remove('show', 'sent');
+      above(dst, pasteTip, 6); pasteTip.classList.add('show');
+      await wait(750); pasteTip.classList.remove('show');
+      fill(sc);
+      await wait(2600); unfresh(sc);
+    }
     /* A delay that doesn't run while the scene is halted (scrolling, off screen, tab hidden), so a scene
        pauses mid-step and carries on where it stopped. */
     /* A tap on a case chip bumps gen: every pending wait and byte flight of the scene in progress then
@@ -1537,6 +1710,7 @@ if (!/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)) {
     /* Resolves when the element's open/switch transition has finished (or after a safety timeout), so
        the arc is measured on the settled layout, not on a window still growing out of the Dock. */
     function settled(el, max) {
+      if (!el) return Promise.resolve();  // a scene with no window on the Mac
       var g = gen;
       var p = new Promise(function (done, fail) {
         function finish(ok) { clearTimeout(t); clearInterval(iv); el.removeEventListener('transitionend', end); if (ok) done(); else fail(ABORT); }
@@ -1636,11 +1810,13 @@ if (!/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)) {
       current = sc;
       resetScene(sc);
       show(sc, index, false);
+      if (!!sc.tri !== triOn) triLayout(!!sc.tri);
       camera('both');
       var srcSide = sc.dir === 'a2m' ? 'phone' : 'mac', dstSide = sc.dir === 'a2m' ? 'mac' : 'phone';
       var settle = Promise.all([settled(q('.win[data-app="' + sc.mac + '"]'), 1400), settled(q('.app[data-app="' + sc.phone + '"]'), 1400)]);
       await wait(1100);
       await settle;
+      if (sc.tri) { await playTri(sc); await wait(1100); return; }
       var src = q('[data-src="' + sc.id + '"]'), dst = q('[data-dst="' + sc.id + '"]');
       // On a phone screen the camera moves in on the device where the copy happens.
       if (narrow.matches) { camera(srcSide); await wait(1000); }
@@ -1711,6 +1887,7 @@ if (!/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)) {
       var sc = SCENES[index];
       current = sc;
       show(sc, index, true);
+      if (!!sc.tri !== triOn) triLayout(!!sc.tri);
       camera('both', 0);
       resetScene(sc);
       var src = q('[data-src="' + sc.id + '"]');
@@ -1756,6 +1933,7 @@ if (!/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)) {
       qa('[data-src].on, .tile.tap').forEach(function (el) { el.classList.remove('on', 'tap'); });
       qa('.fresh').forEach(function (el) { el.classList.remove('fresh'); });
       ripple.classList.remove('go');
+      syPop.classList.remove('show', 'sent'); ipMenu.classList.remove('show', 'pressed');
     }
     var chips = Array.prototype.slice.call(demo.querySelectorAll('.cases button'));
     // Scrolls the chip row (not the page) so the given chip is fully visible.

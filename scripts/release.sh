@@ -63,11 +63,11 @@ step "Checksums and notes"
 (cd "$OUT" && shasum -a 256 Syncliko.apk Syncliko.dmg > SHA256SUMS)
 {
   awk -v v="## $VERSION" '$0 ~ "^"v {on=1; next} on && /^## / {exit} on' CHANGELOG.md
-  print "\n### Install\n"
-  print "- **Mac** (macOS 26+, Apple silicon): open \`Syncliko.dmg\` and drag Syncliko to Applications. Signed with a Developer ID and notarized by Apple."
-  print "- **Android** (12+): install \`Syncliko.apk\`. To get updates automatically, add https://github.com/kdanet/syncliko to [Obtainium](https://obtainium.imranr.dev)."
-  print "\n### Verify\n"
-  print "APK signing certificate SHA-256: \`$(echo $CERT | sed 's/../&:/g; s/:$//' | tr a-f A-F)\`\n"
+  print -- "\n### Install\n"
+  print -- "- **Mac** (macOS 26+, Apple silicon): open \`Syncliko.dmg\` and drag Syncliko to Applications. Signed with a Developer ID and notarized by Apple."
+  print -- "- **Android** (12+): install \`Syncliko.apk\`. To get updates automatically, add https://github.com/kdanet/syncliko to [Obtainium](https://obtainium.imranr.dev)."
+  print -- "\n### Verify\n"
+  print -- "APK signing certificate SHA-256: \`$(echo $CERT | sed 's/../&:/g; s/:$//' | tr a-f A-F)\`\n"
   print '```'; cat "$OUT/SHA256SUMS"; print '```'
 } > "$OUT/notes.md"
 cat "$OUT/SHA256SUMS"

@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="send_to_mac">На Mac</string>
+
+    <!-- Accessibility service -->
+    <string name="accessibility_label">Syncliko: автоотправка</string>
+    <string name="accessibility_summary">Отправляет скопированное на Mac</string>
+    <string name="accessibility_description">Syncliko отслеживает только момент копирования (нажатие «Копировать» или сообщение «Скопировано») и после этого отправляет буфер обмена на ваш Mac. Содержимое экрана не читается и не сохраняется.</string>
+
+    <!-- Onboarding / pairing -->
+    <string name="onb_tagline">Копируйте на телефоне, вставляйте на Mac — и обратно.</string>
+    <string name="onb_step1">Откройте Syncliko в строке меню Mac</string>
+    <string name="onb_step2">Нажмите «Связать устройство…»</string>
+    <string name="onb_step3">Отсканируйте код этим телефоном</string>
+    <string name="onb_scan">Сканировать QR-код</string>
+    <string name="onb_paste">Вставить ссылку для связи</string>
+    <string name="pair_connecting">Подключаемся к Mac…</string>
+    <string name="pair_confirm_title">Подтвердите на Mac</string>
+    <string name="pair_confirm_body">Проверьте, что на %1$s тот же код, и нажмите там «Связать».</string>
+    <string name="pair_failed_title">Не удалось связать устройства</string>
+    <string name="pair_scan_again">Сканировать снова</string>
+    <string name="pair_error_not_code">Это не код для связи Syncliko.</string>
+    <string name="pair_error_scanner">Не удалось открыть сканер QR-кодов (%1$s). Отсканируйте код приложением «Камера» или скопируйте ссылку и нажмите «Вставить ссылку для сопряжения».</string>
+    <string name="pair_error_rejected">Сопряжение отклонено на Mac.</string>
+    <string name="pair_error_certificate">Сертификат Mac не совпадает с QR-кодом. Откройте новый код на Mac и попробуйте снова.</string>
+    <string name="pair_error_unreachable">Mac недоступен. Проверьте, что оба устройства в одной сети Wi-Fi или подключены через Tailscale.</string>
+    <string name="pair_error_expired">Код устарел или уже использован. Откройте новый код на Mac.</string>
+    <string name="action_back">Назад</string>
+    <string name="action_cancel">Отмена</string>
+    <string name="action_allow">Разрешить</string>
+    <string name="action_open">Открыть</string>
+    <string name="action_settings">Настройки</string>
+
+    <!-- Home: status -->
+    <string name="status_connected">Подключено</string>
+    <string name="status_connecting">Подключение…</string>
+    <string name="status_offline">Нет связи с %1$s</string>
+    <string name="status_paused">Пауза</string>
+    <string name="status_via_wifi">%1$s · по Wi-Fi</string>
+    <string name="status_via_tailscale">%1$s · через Tailscale</string>
+    <string name="status_looking_for">Ищем %1$s…</string>
+    <string name="status_paused_body">Ничего не отправляется и не принимается</string>
+    <string name="action_send_clipboard">Отправить скопированное</string>
+    <string name="action_resume">Продолжить</string>
+    <string name="problem_forgot_title">%1$s не узнаёт этот телефон</string>
+    <string name="problem_forgot_body">Скорее всего, телефон удалили в настройках Mac. Свяжите устройства заново.</string>
+    <string name="problem_identity_title">У %1$s новый сертификат</string>
+    <string name="problem_identity_body">Сертификат Mac изменился, например после переустановки. Свяжите устройства заново.</string>
+    <string name="action_pair_again">Связать заново</string>
+
+    <!-- Home: automatic sending -->
+    <string name="auto_title">Автоотправка</string>
+    <string name="auto_state_pro">Включена · режим Pro</string>
+    <string name="auto_state_standard">Включена · стандартный режим</string>
+    <string name="auto_state_off">Выключена</string>
+    <string name="auto_state_needs_setup">Остался один шаг</string>
+    <string name="auto_body_active">Всё скопированное сразу попадает на Mac.</string>
+    <string name="auto_body_setup">Разрешите Syncliko в спецвозможностях — и всё скопированное само окажется на Mac, как на iPhone.</string>
+    <string name="auto_body_off">Скопированное можно отправить одним касанием: меню выделения, «Поделиться» или плитка.</string>
+    <string name="action_set_up">Настроить</string>
+
+    <!-- Home: manual sending -->
+    <string name="how_title">Как отправить вручную</string>
+    <string name="how_select">Выделите текст → «На Mac»</string>
+    <string name="how_select_sub">В меню над выделенным текстом</string>
+    <string name="how_share">Поделиться → Syncliko</string>
+    <string name="how_share_sub">Ссылки и картинки из любого приложения</string>
+    <string name="how_tile">Плитка в шторке</string>
+    <string name="how_tile_sub">Одно касание — и скопированное на Mac</string>
+    <string name="how_add_tile">Добавить</string>
+
+    <!-- Home: setup checklist -->
+    <string name="setup_title">Завершите настройку</string>
+    <string name="setup_local_network">Разрешите доступ к локальной сети</string>
+    <string name="setup_local_network_sub">Нужно, чтобы подключаться к Mac по Wi-Fi</string>
+    <string name="setup_notifications">Разрешите уведомления</string>
+    <string name="setup_notifications_sub">Статус подключения и быстрая отправка</string>
+    <string name="setup_battery">Отключите экономию заряда для Syncliko</string>
+    <string name="setup_battery_sub">Батарея → «Без ограничений», чтобы копии с Mac приходили мгновенно</string>
+    <string name="setup_battery_sub_samsung">Батарея → «Без ограничений». Ещё добавьте Syncliko в «Неспящие приложения»: Батарея → Ограничения фонового использования</string>
+
+    <!-- History -->
+    <string name="history_title">Недавние</string>
+    <string name="history_empty_title">Пока пусто</string>
+    <string name="history_empty_body">Скопируйте что-нибудь на телефоне или Mac — и оно появится здесь.</string>
+    <string name="history_just_now">только что</string>
+    <string name="history_clear">Очистить</string>
+    <string name="history_from_mac">С Mac</string>
+    <string name="history_to_mac">На Mac</string>
+    <string name="history_image">Изображение · %1$s</string>
+    <string name="history_copied">Скопировано в буфер</string>
+    <string name="history_delete">Удалить</string>
+    <string name="history_copy">Копировать</string>
+
+    <!-- Send results -->
+    <string name="send_sent">Отправлено на %1$s</string>
+    <string name="send_queued">%1$s не в сети. Отправим, когда подключится</string>
+    <string name="send_nothing">Буфер обмена пуст</string>
+    <string name="send_duplicate">Уже на %1$s</string>
+    <string name="send_paused">Синхронизация на паузе</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Настройки</string>
+    <string name="sec_auto">Автоотправка</string>
+    <string name="auto_switch">Отправлять скопированное автоматически</string>
+    <string name="auto_switch_sub">Используется лучший из настроенных ниже режимов</string>
+    <string name="mode_standard_title">Автоматически</string>
+    <string name="mode_standard_body">Использует спецвозможности, чтобы заметить нажатие «Копировать». Содержимое экрана не читается. Работает в большинстве приложений.</string>
+    <string name="mode_standard_action">Открыть спецвозможности</string>
+    <string name="mode_standard_hint">Найдите «Syncliko: автоотправка» (на Samsung — в «Установленных приложениях») и включите. Если переключатель неактивен: «О приложении» → ⋮ → «Разрешить ограниченные настройки», затем повторите.</string>
+    <string name="action_app_info">О приложении</string>
+    <string name="mode_pro_title">Расширенный · через компьютер</string>
+    <string name="mode_pro_body">Самый надёжный: ловит любое копирование в любом приложении. Разовая настройка с компьютера.</string>
+    <string name="mode_pro_step_overlay">Разрешите «Поверх других приложений»</string>
+    <string name="mode_pro_step_overlay_done">«Поверх других приложений» разрешено</string>
+    <string name="mode_pro_step_overlay_a11y">Не нужно, пока включён стандартный режим</string>
+    <string name="mode_pro_step_adb">Подключите телефон к компьютеру с ADB и выполните:</string>
+    <string name="mode_pro_copy">Копировать команду</string>
+    <string name="mode_pro_copied">Команда скопирована</string>
+    <string name="mode_pro_note">После перезагрузки телефона откройте Syncliko и нажмите «Разрешить», когда Android спросит доступ к журналам устройства.</string>
+    <string name="mode_pro_pending">Android ещё не подтвердил доступ к журналам устройства. Если он спрашивал — выберите «Разрешить». Не видели запроса? Запросите снова.</string>
+    <string name="mode_pro_request">Запросить доступ снова</string>
+    <string name="mode_state_pending">Нужно подтверждение</string>
+    <string name="auto_state_pro_pending">Режим Pro · ждёт доступа к журналам</string>
+    <string name="mode_state_active">Активен</string>
+    <string name="mode_state_ready">Готов</string>
+    <string name="mode_state_off">Не настроен</string>
+    <string name="sec_sync">Синхронизация</string>
+    <string name="sync_enabled">Синхронизировать буфер</string>
+    <string name="sync_enabled_sub">На паузе ничего не отправляется и не принимается</string>
+    <string name="send_on_open">Отправлять при открытии Syncliko</string>
+    <string name="send_on_open_sub">При открытии приложения новое содержимое буфера отправляется на Mac</string>
+    <string name="sec_appearance">Оформление</string>
+    <string name="dynamic_color">Цвета обоев</string>
+    <string name="dynamic_color_sub">Material You вместо фирменной палитры Syncliko</string>
+    <string name="sec_connection">Подключение</string>
+    <string name="conn_mac">Mac</string>
+    <string name="conn_addresses">Адреса</string>
+    <string name="conn_phone">Этот телефон</string>
+    <string name="conn_fingerprint">Отпечаток</string>
+    <string name="conn_reconnect">Переподключиться</string>
+    <string name="unpair">Отвязать %1$s</string>
+    <string name="unpair_title">Отвязать %1$s?</string>
+    <string name="unpair_body">Синхронизация остановится, пока вы не отсканируете новый код. Удалите этот телефон и в настройках Syncliko на Mac.</string>
+    <string name="action_unpair">Отвязать</string>
+    <string name="sec_about">О приложении</string>
+    <string name="about_version">Версия %1$s</string>
+    <string name="about_privacy">Данные передаются только между вашими устройствами и шифруются TLS 1.3. Без серверов и аккаунтов.</string>
+
+    <!-- Notification / tile -->
+    <string name="notif_channel">Синхронизация буфера</string>
+    <string name="notif_channel_desc">Состояние связи с Mac. Можно отключить: синхронизация продолжит работать.</string>
+    <string name="notif_connected">Подключено к %1$s</string>
+    <string name="notif_connected_tailscale">Подключено к %1$s · Tailscale</string>
+    <string name="notif_waiting">Ждём %1$s…</string>
+    <string name="notif_connecting">Подключение к %1$s…</string>
+    <string name="notif_paused">Синхронизация на паузе</string>
+    <string name="notif_auto_on">Скопированное отправляется автоматически</string>
+    <string name="notif_auto_off">Нажмите «Отправить буфер», чтобы отправить копию</string>
+    <string name="notif_problem">Свяжите устройства заново в Syncliko</string>
+    <string name="tile_not_paired">Нет связи с Mac</string>
+    <string name="tile_offline">Не в сети</string>
+    <string name="action_pause">Пауза</string>
+    <string name="action_pair">Связать</string>
+    <string name="action_continue">Продолжить</string>
+    <string name="action_finish_setup">Завершить настройку</string>
+    <string name="pair_try_again">Попробовать снова</string>
+    <string name="notif_pro_pending">Откройте Syncliko, чтобы возобновить автоотправку</string>
+    <string name="send_too_large">Слишком большой файл (максимум 20 МБ)</string>
+    <string name="invite_title">Связать с %1$s?</string>
+    <string name="invite_body">Открыта ссылка для связи. Продолжайте, только если вы сами только что открыли код на своём Mac.</string>
+    <string name="invite_replace">Это заменит %1$s.</string>
+    <string name="invite_fingerprint">Отпечаток Mac: %1$s</string>
+    <string name="status_offline_hint">Mac включён и в той же сети Wi-Fi или Tailscale?</string>
+    <string name="setup_autostart">Разрешите автозапуск</string>
+    <string name="setup_autostart_sub">Оболочка %1$s закрывает фоновые приложения. Разрешите Syncliko запускаться и работать в фоне.</string>
+    <string name="setup_restricted">Работа в фоне ограничена</string>
+    <string name="setup_restricted_sub">Syncliko не может оставаться на связи. Выберите для батареи режим «Без ограничений».</string>
+    <string name="mode_badge_recommended">Рекомендуется</string>
+    <string name="advanced_title">Для опытных пользователей</string>
+    <string name="a11y_explain_title">Что видит Syncliko</string>
+    <string name="a11y_explain_body">Android предупреждает, что приложения спецвозможностей могут видеть экран и управлять телефоном. Syncliko только ждёт момента, когда вы нажимаете «Копировать» или появляется «Скопировано», и после этого читает буфер. Он не читает текст на экране, ничего не нажимает и отправляет данные только на ваш Mac.</string>
+    <string name="a11y_step_restricted">«О приложении» → ⋮ → «Разрешить ограниченные настройки»</string>
+    <string name="a11y_step_enable">Спецвозможности → Установленные приложения → «Syncliko: автоотправка» → Вкл.</string>
+    <string name="a11y_stalled">Android остановил службу. Выключите и снова включите её в настройках спецвозможностей.</string>
+    <string name="toast_note">При каждой отправке Android показывает «Syncliko вставил данные из буфера обмена». Так и должно быть.</string>
+    <string name="conn_status">Статус</string>
+    <string name="history_more">Ещё</string>
+    <string name="notif_setting">Уведомление о состоянии</string>
+    <string name="notif_setting_sub">Android требует его для работы в фоне, но его можно скрыть. Синхронизация продолжит работать, а Syncliko останется только в «Активных приложениях» в быстрых настройках.</string>
+    <string name="notif_setting_action">Скрыть</string>
+    <string name="alert_channel">Проблемы, требующие действия</string>
+    <string name="alert_title">Syncliko потеряла связь с %1$s</string>
+    <string name="notif_setting_hosted">Не показывается: пока включена автоотправка через спецвозможности, Android и без него держит Syncliko в работе.</string>
+</resources>

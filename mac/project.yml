@@ -1,0 +1,40 @@
+name: Syncliko
+options:
+  bundleIdPrefix: com.syncliko
+  deploymentTarget:
+    macOS: "26.0"
+  createIntermediateGroups: true
+packages:
+  SynclikoCore:
+    path: Packages/SynclikoCore
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    MARKETING_VERSION: "0.3.2"
+    CURRENT_PROJECT_VERSION: "5"
+    CODE_SIGN_STYLE: Manual
+    CODE_SIGN_IDENTITY: "-"
+    ENABLE_HARDENED_RUNTIME: YES
+    SWIFT_STRICT_CONCURRENCY: complete
+targets:
+  Syncliko:
+    type: application
+    platform: macOS
+    sources:
+      - path: SynclikoMac
+    dependencies:
+      - package: SynclikoCore
+        product: SynclikoProtocol
+      - package: SynclikoCore
+        product: SynclikoTransport
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.syncliko.mac
+        PRODUCT_NAME: Syncliko
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_LSUIElement: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Syncliko
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity
+        INFOPLIST_KEY_NSHumanReadableCopyright: "© 2026 Danil Kuksenok. MIT License."
+        INFOPLIST_FILE: SynclikoMac/Resources/Info.plist
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon

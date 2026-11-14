@@ -1,0 +1,148 @@
+{
+  "frames" : [
+    {
+      "header" : {
+        "appVersion" : "0.1.0",
+        "deviceId" : "mac-1",
+        "deviceName" : "MacBook Pro",
+        "platform" : "macos",
+        "protocolVersion" : 1
+      },
+      "hex" : "010000006b000000007b2261707056657273696f6e223a22302e312e30222c226465766963654964223a226d61632d31222c226465766963654e616d65223a224d6163426f6f6b2050726f222c22706c6174666f726d223a226d61636f73222c2270726f746f636f6c56657273696f6e223a317d",
+      "name" : "hello",
+      "payloadHex" : "",
+      "type" : 1
+    },
+    {
+      "header" : {
+        "deviceId" : "android-1",
+        "deviceName" : "Galaxy S25",
+        "platform" : "android",
+        "token" : "AAECAwQFBgcICQoLDA0ODw"
+      },
+      "hex" : "0200000068000000007b226465766963654964223a22616e64726f69642d31222c226465766963654e616d65223a2247616c61787920533235222c22706c6174666f726d223a22616e64726f6964222c22746f6b656e223a2241414543417751464267634943516f4c4441304f4477227d",
+      "name" : "pairRequest",
+      "payloadHex" : "",
+      "type" : 2
+    },
+    {
+      "header" : {
+        "accepted" : true,
+        "deviceId" : "mac-1",
+        "deviceName" : "MacBook Pro"
+      },
+      "hex" : "030000003f000000007b226163636570746564223a747275652c226465766963654964223a226d61632d31222c226465766963654e616d65223a224d6163426f6f6b2050726f227d",
+      "name" : "pairResult",
+      "payloadHex" : "",
+      "type" : 3
+    },
+    {
+      "header" : {
+        "createdAt" : 1763078400000,
+        "id" : "6F9619FF-8B86-D011-B42D-00C04FC964FF",
+        "kind" : "text",
+        "mime" : "text/plain;charset=utf-8",
+        "origin" : "mac-1",
+        "sensitive" : false,
+        "sha256" : "24936400dec14e2f07977823ffe1ab2558de8241419a51e16a1b0c51e3a97453",
+        "size" : 28
+      },
+      "hex" : "10000000f00000001c7b22637265617465644174223a313736333037383430303030302c226964223a2236463936313946462d384238362d443031312d423432442d303043303446433936344646222c226b696e64223a2274657874222c226d696d65223a22746578742f706c61696e3b636861727365743d7574662d38222c226f726967696e223a226d61632d31222c2273656e736974697665223a66616c73652c22736861323536223a2232343933363430306465633134653266303739373738323366666531616232353538646538323431343139613531653136613162306335316533613937343533222c2273697a65223a32387dd09fd180d0b8d0b2d0b5d1822c2053796e636c696b6f2120f09f918b",
+      "name" : "clipText",
+      "payloadHex" : "d09fd180d0b8d0b2d0b5d1822c2053796e636c696b6f2120f09f918b",
+      "type" : 16
+    },
+    {
+      "header" : {
+        "id" : "6F9619FF-8B86-D011-B42D-00C04FC964FF",
+        "offset" : 262144
+      },
+      "hex" : "110000003d000000037b226964223a2236463936313946462d384238362d443031312d423432442d303043303446433936344646222c226f6666736574223a3236323134347d616263",
+      "name" : "clipChunk",
+      "payloadHex" : "616263",
+      "type" : 17
+    },
+    {
+      "header" : {
+        "id" : "6F9619FF-8B86-D011-B42D-00C04FC964FF"
+      },
+      "hex" : "120000002d000000007b226964223a2236463936313946462d384238362d443031312d423432442d303043303446433936344646227d",
+      "name" : "ack",
+      "payloadHex" : "",
+      "type" : 18
+    },
+    {
+      "header" : {
+        "t" : 1763078400000
+      },
+      "hex" : "2000000013000000007b2274223a313736333037383430303030307d",
+      "name" : "ping",
+      "payloadHex" : "",
+      "type" : 32
+    },
+    {
+      "header" : {
+        "t" : 1763078400000
+      },
+      "hex" : "2100000013000000007b2274223a313736333037383430303030307d",
+      "name" : "pong",
+      "payloadHex" : "",
+      "type" : 33
+    },
+    {
+      "header" : {
+
+      },
+      "hex" : "3000000002000000007b7d",
+      "name" : "requestLatest",
+      "payloadHex" : "",
+      "type" : 48
+    },
+    {
+      "header" : {
+        "endpoints" : [
+          {
+            "host" : "192.168.1.20",
+            "kind" : "lan",
+            "port" : 47823
+          },
+          {
+            "host" : "100.101.102.103",
+            "kind" : "tailscale",
+            "port" : 47823
+          }
+        ]
+      },
+      "hex" : "310000007c000000007b22656e64706f696e7473223a5b7b22686f7374223a223139322e3136382e312e3230222c226b696e64223a226c616e222c22706f7274223a34373832337d2c7b22686f7374223a223130302e3130312e3130322e313033222c226b696e64223a227461696c7363616c65222c22706f7274223a34373832337d5d7d",
+      "name" : "endpoints",
+      "payloadHex" : "",
+      "type" : 49
+    },
+    {
+      "header" : {
+        "code" : "unknownType",
+        "message" : "type 0x42"
+      },
+      "hex" : "7f0000002c000000007b22636f6465223a22756e6b6e6f776e54797065222c226d657373616765223a22747970652030783432227d",
+      "name" : "error",
+      "payloadHex" : "",
+      "type" : 127
+    }
+  ],
+  "pairingInvites" : [
+    {
+      "deviceId" : "mac-1",
+      "deviceName" : "Danil's MacBook Pro",
+      "fingerprintHex" : "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+      "hosts" : [
+        "192.168.1.20",
+        "100.101.102.103",
+        "macbook.tail1234.ts.net"
+      ],
+      "port" : 47823,
+      "tokenHex" : "f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff",
+      "url" : "syncliko://pair?v=1&id=mac-1&n=Danil's%20MacBook%20Pro&fp=AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8&t=8PHy8_T19vf4-fr7_P3-_w&p=47823&h=192.168.1.20,100.101.102.103,macbook.tail1234.ts.net"
+    }
+  ],
+  "protocolVersion" : 1
+}

@@ -1,0 +1,17 @@
+.DS_Store
+.build/
+.swiftpm/
+DerivedData/
+build/
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+mac/Syncliko.xcodeproj/
+# Android
+.gradle/
+local.properties
+android/**/build/
+.idea/
+*.iml
+dist/
+.kotlin/
+

@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">Syncliko</string>
+    <string name="send_to_mac">Send to Mac</string>
+
+    <!-- Accessibility service -->
+    <string name="accessibility_label">Syncliko automatic sending</string>
+    <string name="accessibility_summary">Sends what you copy to your Mac</string>
+    <string name="accessibility_description">Syncliko watches only for the moment you copy something (a tap on “Copy” or a “Copied” message) and then sends the clipboard to your paired Mac. It doesn’t read or store anything on your screen.</string>
+
+    <!-- Onboarding / pairing -->
+    <string name="onb_tagline">Copy on your phone, paste on your Mac — and back.</string>
+    <string name="onb_step1">Open Syncliko in your Mac’s menu bar</string>
+    <string name="onb_step2">Click “Pair a Device…”</string>
+    <string name="onb_step3">Scan the code with this phone</string>
+    <string name="onb_scan">Scan QR code</string>
+    <string name="onb_paste">Paste pairing link</string>
+    <string name="pair_connecting">Connecting to your Mac…</string>
+    <string name="pair_confirm_title">Confirm on your Mac</string>
+    <string name="pair_confirm_body">Check that %1$s shows the same code, then click “Pair” there.</string>
+    <string name="pair_failed_title">Couldn’t pair</string>
+    <string name="pair_scan_again">Scan again</string>
+    <string name="pair_error_not_code">That isn’t a Syncliko pairing code.</string>
+    <string name="pair_error_scanner">Couldn’t open the QR scanner (%1$s). Scan the code with the Camera app instead, or copy the pairing link and tap “Paste pairing link”.</string>
+    <string name="pair_error_rejected">Pairing was declined on the Mac.</string>
+    <string name="pair_error_certificate">The Mac’s certificate doesn’t match the QR code. Open a new code on the Mac and try again.</string>
+    <string name="pair_error_unreachable">Can’t reach the Mac. Make sure both devices are on the same Wi-Fi or connected through Tailscale.</string>
+    <string name="pair_error_expired">The code has expired or was already used. Open a new code on the Mac.</string>
+    <string name="action_back">Back</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_allow">Allow</string>
+    <string name="action_open">Open</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- Home: status -->
+    <string name="status_connected">Connected</string>
+    <string name="status_connecting">Connecting…</string>
+    <string name="status_offline">Can’t reach %1$s</string>
+    <string name="status_paused">Paused</string>
+    <string name="status_via_wifi">%1$s · same Wi-Fi</string>
+    <string name="status_via_tailscale">%1$s · via Tailscale</string>
+    <string name="status_looking_for">Looking for %1$s…</string>
+    <string name="status_paused_body">Nothing is sent or received</string>
+    <string name="action_send_clipboard">Send clipboard</string>
+    <string name="action_resume">Resume</string>
+    <string name="problem_forgot_title">%1$s doesn’t recognize this phone</string>
+    <string name="problem_forgot_body">The phone was probably removed on the Mac. Pair again to continue syncing.</string>
+    <string name="problem_identity_title">%1$s has a new identity</string>
+    <string name="problem_identity_body">The Mac’s certificate changed, for example after a reinstall. Pair again to trust it.</string>
+    <string name="action_pair_again">Pair again</string>
+
+    <!-- Home: automatic sending -->
+    <string name="auto_title">Automatic sending</string>
+    <string name="auto_state_pro">On · Pro mode</string>
+    <string name="auto_state_standard">On · Standard mode</string>
+    <string name="auto_state_off">Off</string>
+    <string name="auto_state_needs_setup">One step left</string>
+    <string name="auto_body_active">Everything you copy goes to your Mac instantly.</string>
+    <string name="auto_body_setup">Allow Syncliko in Accessibility settings, and everything you copy goes to your Mac by itself.</string>
+    <string name="auto_body_off">You can still send with one tap: the selection menu, Share or the tile.</string>
+    <string name="action_set_up">Set up</string>
+
+    <!-- Home: manual sending -->
+    <string name="how_title">Ways to send by hand</string>
+    <string name="how_select">Select text → “Send to Mac”</string>
+    <string name="how_select_sub">In the menu over selected text</string>
+    <string name="how_share">Share → Syncliko</string>
+    <string name="how_share_sub">Links and images from any app</string>
+    <string name="how_tile">Quick Settings tile</string>
+    <string name="how_tile_sub">One tap sends what you copied</string>
+    <string name="how_add_tile">Add tile</string>
+
+    <!-- Home: setup checklist -->
+    <string name="setup_title">Finish setup</string>
+    <string name="setup_local_network">Allow local network access</string>
+    <string name="setup_local_network_sub">Needed to reach your Mac over Wi-Fi</string>
+    <string name="setup_notifications">Allow notifications</string>
+    <string name="setup_notifications_sub">Connection status and a quick send button</string>
+    <string name="setup_battery">Keep Syncliko awake</string>
+    <string name="setup_battery_sub">Battery → Unrestricted, so copies from the Mac arrive instantly</string>
+    <string name="setup_battery_sub_samsung">Battery → Unrestricted. Also add Syncliko to “Never sleeping apps” in Battery → Background usage limits</string>
+
+    <!-- History -->
+    <string name="history_title">Recent</string>
+    <string name="history_empty_title">No clips yet</string>
+    <string name="history_empty_body">Copy something on your phone or Mac and it shows up here.</string>
+    <string name="history_just_now">just now</string>
+    <string name="history_clear">Clear</string>
+    <string name="history_from_mac">From Mac</string>
+    <string name="history_to_mac">To Mac</string>
+    <string name="history_image">Image · %1$s</string>
+    <string name="history_copied">Copied to clipboard</string>
+    <string name="history_delete">Delete</string>
+    <string name="history_copy">Copy</string>
+
+    <!-- Send results -->
+    <string name="send_sent">Sent to %1$s</string>
+    <string name="send_queued">%1$s is offline. It will get it when it reconnects</string>
+    <string name="send_nothing">Clipboard is empty</string>
+    <string name="send_duplicate">Already on %1$s</string>
+    <string name="send_paused">Syncing is paused</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="sec_auto">Automatic sending</string>
+    <string name="auto_switch">Send what I copy automatically</string>
+    <string name="auto_switch_sub">Uses the best mode that’s set up below</string>
+    <string name="mode_standard_title">Automatic</string>
+    <string name="mode_standard_body">Uses Accessibility to notice the moment you tap “Copy”. It doesn’t read your screen. Works in most apps.</string>
+    <string name="mode_standard_action">Open Accessibility settings</string>
+    <string name="mode_standard_hint">Find “Syncliko automatic sending” (on Samsung: Installed apps) and turn it on. If the switch is greyed out, open App info → ⋮ → Allow restricted settings, then try again.</string>
+    <string name="action_app_info">App info</string>
+    <string name="mode_pro_title">Advanced · needs a computer</string>
+    <string name="mode_pro_body">The most reliable: catches every copy in every app. One-time setup from a computer.</string>
+    <string name="mode_pro_step_overlay">Allow “Display over other apps”</string>
+    <string name="mode_pro_step_overlay_done">“Display over other apps” is allowed</string>
+    <string name="mode_pro_step_overlay_a11y">Not needed while Standard mode is on</string>
+    <string name="mode_pro_step_adb">Connect the phone to a computer with ADB and run:</string>
+    <string name="mode_pro_copy">Copy command</string>
+    <string name="mode_pro_copied">Command copied</string>
+    <string name="mode_pro_note">After the phone restarts, open Syncliko once and tap “Allow” when Android asks for access to device logs.</string>
+    <string name="mode_pro_pending">Android hasn’t confirmed access to device logs yet. If it asked, choose “Allow”. Didn’t see the prompt? Request it again.</string>
+    <string name="mode_pro_request">Request access again</string>
+    <string name="mode_state_pending">Needs approval</string>
+    <string name="auto_state_pro_pending">Pro mode · waiting for log access</string>
+    <string name="mode_state_active">Active</string>
+    <string name="mode_state_ready">Ready</string>
+    <string name="mode_state_off">Not set up</string>
+    <string name="sec_sync">Sync</string>
+    <string name="sync_enabled">Sync clipboard</string>
+    <string name="sync_enabled_sub">Pause to stop sending and receiving</string>
+    <string name="send_on_open">Send when I open Syncliko</string>
+    <string name="send_on_open_sub">Opening the app sends a new clipboard to the Mac</string>
+    <string name="sec_appearance">Appearance</string>
+    <string name="dynamic_color">Wallpaper colors</string>
+    <string name="dynamic_color_sub">Use Material You colors instead of Syncliko’s palette</string>
+    <string name="sec_connection">Connection</string>
+    <string name="conn_mac">Mac</string>
+    <string name="conn_addresses">Addresses</string>
+    <string name="conn_phone">This phone</string>
+    <string name="conn_fingerprint">Fingerprint</string>
+    <string name="conn_reconnect">Reconnect now</string>
+    <string name="unpair">Unpair %1$s</string>
+    <string name="unpair_title">Unpair %1$s?</string>
+    <string name="unpair_body">Clipboard sync stops until you scan a new code. Also remove this phone in Syncliko’s settings on the Mac.</string>
+    <string name="action_unpair">Unpair</string>
+    <string name="sec_about">About</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="about_privacy">Clips travel only between your devices, end-to-end encrypted with TLS 1.3. No servers, no accounts.</string>
+
+    <!-- Notification / tile -->
+    <string name="notif_channel">Clipboard sync</string>
+    <string name="notif_channel_desc">Status of the connection to your Mac. You can turn it off: syncing keeps working.</string>
+    <string name="notif_connected">Connected to %1$s</string>
+    <string name="notif_connected_tailscale">Connected to %1$s · Tailscale</string>
+    <string name="notif_waiting">Waiting for %1$s…</string>
+    <string name="notif_connecting">Connecting to %1$s…</string>
+    <string name="notif_paused">Syncing paused</string>
+    <string name="notif_auto_on">Copies are sent automatically</string>
+    <string name="notif_auto_off">Tap “Send clipboard” to send a copy</string>
+    <string name="notif_problem">Pair again in Syncliko</string>
+    <string name="tile_not_paired">Not paired</string>
+    <string name="tile_offline">Offline</string>
+    <string name="action_pause">Pause</string>
+    <string name="action_pair">Pair</string>
+    <string name="action_continue">Continue</string>
+    <string name="action_finish_setup">Finish setup</string>
+    <string name="pair_try_again">Try again</string>
+    <string name="notif_pro_pending">Open Syncliko to resume automatic sending</string>
+    <string name="send_too_large">Too large to send (max 20 MB)</string>
+    <string name="invite_title">Pair with %1$s?</string>
+    <string name="invite_body">A pairing link was opened. Continue only if you just showed the pairing code on your own Mac.</string>
+    <string name="invite_replace">This replaces %1$s.</string>
+    <string name="invite_fingerprint">Mac fingerprint: %1$s</string>
+    <string name="status_offline_hint">Is the Mac awake and on the same Wi-Fi or Tailscale?</string>
+    <string name="setup_autostart">Allow autostart</string>
+    <string name="setup_autostart_sub">%1$s closes background apps. Let Syncliko start and run in the background.</string>
+    <string name="setup_restricted">Background use is restricted</string>
+    <string name="setup_restricted_sub">Syncliko can’t stay connected. Set battery usage to Unrestricted.</string>
+    <string name="mode_badge_recommended">Recommended</string>
+    <string name="advanced_title">For power users</string>
+    <string name="a11y_explain_title">What Syncliko can see</string>
+    <string name="a11y_explain_body">Android warns that accessibility apps can see your screen and control the phone. Syncliko only listens for the moment you tap “Copy” or a “Copied” message appears, then reads the clipboard. It doesn’t read text on screen, doesn’t tap anything, and sends data only to your Mac.</string>
+    <string name="a11y_step_restricted">App info → ⋮ → Allow restricted settings</string>
+    <string name="a11y_step_enable">Accessibility → Installed apps → Syncliko automatic sending → On</string>
+    <string name="a11y_stalled">Android stopped the service. Turn it off and on again in Accessibility settings.</string>
+    <string name="toast_note">Android shows “Syncliko pasted from your clipboard” each time a copy is sent. That’s expected.</string>
+    <string name="conn_status">Status</string>
+    <string name="history_more">More</string>
+    <string name="notif_setting">Status notification</string>
+    <string name="notif_setting_sub">Android requires it for background work, but you can hide it. Syncing keeps working; Syncliko then shows up only under Active apps in Quick Settings.</string>
+    <string name="notif_setting_action">Hide</string>
+    <string name="alert_channel">Problems that need you</string>
+    <string name="alert_title">Syncliko lost %1$s</string>
+    <string name="notif_setting_hosted">Not shown: while automatic sending (accessibility) is on, Android keeps Syncliko running without it.</string>
+</resources>

@@ -1,0 +1,112 @@
+/* App status */
+"Connected to %@" = "Подключено к %@";
+"Connected to %lld devices" = "Подключено устройств: %lld";
+"Starting…" = "Запуск…";
+"Can’t accept connections" = "Не принимает подключения";
+"Syncliko couldn’t read its encryption key from the Keychain. Allow access when macOS asks, then restart Syncliko." = "Syncliko не смог прочитать ключ шифрования из Связки ключей. Разрешите доступ, когда macOS спросит, и перезапустите Syncliko.";
+
+/* Pairing */
+"Open Syncliko on your Android phone and scan this code. The Samsung camera works too." = "Откройте Syncliko на Android и отсканируйте код. Подойдёт и камера Samsung.";
+"Pairing QR code" = "QR-код для добавления устройства";
+"Code expires in %lld:%@" = "Код действует ещё %lld:%@";
+"Next: allow Syncliko to paste from other apps" = "Дальше: разрешите Syncliko вставку из других приложений";
+"Connection details" = "Параметры подключения";
+"Port" = "Порт";
+"Addresses" = "Адреса";
+"This Mac" = "Этот Mac";
+"Pair with “%@”?" = "Добавить «%@»?";
+"Check that your phone shows the same code:" = "Проверьте, что телефон показывает тот же код:";
+"The phone will be able to read and change your Mac’s clipboard." = "Телефон сможет читать и менять буфер обмена этого Mac.";
+"Decline" = "Отклонить";
+"Pair" = "Добавить";
+"Paired with %@" = "%@ добавлен";
+"Copy something on either device and paste it on the other." = "Скопируйте что-нибудь на одном устройстве и вставьте на другом.";
+"Pairing declined" = "Добавление отклонено";
+"The phone disconnected before pairing finished" = "Телефон отключился, не завершив добавление";
+"The pairing code has expired" = "Код устарел";
+"Show New Code" = "Показать новый код";
+"Done" = "Готово";
+
+/* Menu */
+"Syncliko can’t accept connections" = "Syncliko не может принимать подключения";
+"Allow Local Network access for Syncliko in System Settings → Privacy & Security, then reopen the app." = "Разрешите Syncliko доступ к локальной сети в Системных настройках → Конфиденциальность и безопасность и откройте приложение снова.";
+"Clipboard access is blocked" = "Доступ к буферу запрещён";
+"Allow clipboard access" = "Разрешите доступ к буферу";
+"In Privacy & Security → Paste from Other Apps, set Syncliko to “Always Allow”. Otherwise macOS asks on every copy." = "В разделе «Конфиденциальность и безопасность» → «Вставка из других приложений» выберите для Syncliko «Всегда разрешать». Иначе macOS будет спрашивать при каждом копировании.";
+"Open Settings" = "Открыть настройки";
+"Your last copy will reach the phone when it reconnects" = "Последняя копия попадёт на телефон, когда он подключится";
+"Sync" = "Синхронизация";
+"Resume syncing" = "Возобновить синхронизацию";
+"Pause syncing" = "Приостановить синхронизацию";
+"Install Syncliko on the phone" = "Установите Syncliko на телефон";
+"Copy on one device, paste on the other" = "Копируйте на одном устройстве, вставляйте на другом";
+"Recent" = "Недавние";
+"Clear" = "Очистить";
+"Settings" = "Настройки";
+"Quit Syncliko" = "Выйти из Syncliko";
+"%@ wants to pair" = "%@ хочет подключиться";
+"Code on the phone: %@" = "Код на телефоне: %@";
+"Copy again" = "Скопировать снова";
+"Copy" = "Скопировать";
+"Delete" = "Удалить";
+"Image · %@" = "Изображение · %@";
+"just now" = "только что";
+"From %@ · %@" = "С %@ · %@";
+"To %@ · %@" = "На %@ · %@";
+
+/* Settings */
+"General" = "Основные";
+"Devices" = "Устройства";
+"Open at login" = "Открывать при входе";
+"Approve Syncliko in System Settings → General → Login Items." = "Разрешите Syncliko в Системных настройках → Основные → Объекты входа.";
+"Sync clipboard" = "Синхронизировать буфер";
+"Clipboard access" = "Доступ к буферу";
+"Paste from other apps" = "Вставка из других приложений";
+"Always allowed" = "Всегда разрешено";
+"Denied" = "Запрещено";
+"Asks every time" = "Спрашивает каждый раз";
+"Open Privacy Settings…" = "Открыть настройки конфиденциальности…";
+"Everything you copy is synced, including passwords and codes." = "Синхронизируется всё скопированное, включая пароли и коды.";
+"Name" = "Имя";
+"Status" = "Статус";
+"Fingerprint" = "Отпечаток";
+"Connected" = "Подключено";
+"Remove…" = "Удалить…";
+"Remove %@?" = "Удалить %@?";
+"Remove" = "Удалить";
+
+/* 0.3.2 redesign */
+"Sync is paused" = "Синхронизация на паузе";
+"No devices yet" = "Устройств пока нет";
+"Connect your Android phone" = "Подключите телефон на Android";
+"Click Add Device and scan the code" = "Нажмите «Добавить устройство» и отсканируйте код";
+"Add Device…" = "Добавить устройство…";
+"Add a Device" = "Добавление устройства";
+"Copy something on your Mac or phone and it shows up here." = "Скопируйте что-нибудь на Mac или телефоне, и копия появится здесь.";
+"Settings…" = "Настройки…";
+"Not connected" = "Не подключён";
+"No connection" = "Нет подключения";
+"Connects when its screen is on" = "Подключится, когда включится экран";
+"Connected · Wi-Fi" = "Подключён · Wi-Fi";
+"Connected · Tailscale" = "Подключён · Tailscale";
+"About" = "О программе";
+"Paired devices" = "Добавленные устройства";
+"No devices yet. Add your Android phone to start syncing." = "Устройств пока нет. Добавьте телефон на Android, чтобы начать синхронизацию.";
+"Added %@" = "Добавлен %@";
+"The phone will stop syncing until you add it again." = "Телефон перестанет синхронизироваться, пока вы не добавите его снова.";
+"Version %@ (%@)" = "Версия %@ (%@)";
+"A shared clipboard for your Android phone and your Mac, over Wi-Fi or Tailscale. No account, no cloud." = "Общий буфер обмена для телефона на Android и Mac через Wi-Fi или Tailscale. Без аккаунта и облака.";
+
+/* Updates */
+"Syncliko %@ is available" = "Доступна Syncliko %@";
+"You have version %@. Download the new disk image and drag Syncliko to Applications." = "У вас версия %@. Скачайте новый образ диска и перетащите Syncliko в «Программы».";
+"Download" = "Скачать";
+"Download…" = "Скачать…";
+"Updates" = "Обновления";
+"Check for updates automatically" = "Проверять обновления автоматически";
+"Check Now" = "Проверить";
+"Version %@" = "Версия %@";
+"Version %@ is available" = "Доступна версия %@";
+"Couldn’t reach GitHub" = "Не удалось связаться с GitHub";
+"Up to date · checked %@" = "Последняя версия · проверено %@";
+"Not checked yet" = "Ещё не проверялось";

@@ -1,0 +1,1402 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Syncliko</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="A shared clipboard for an Android phone and a Mac. Copy on one, paste on the other, over Wi-Fi or Tailscale. No account, no cloud.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f5f6f9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1016" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="icon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Syncliko">
+<meta property="og:description" content="Copy on Android, paste on your Mac. A shared clipboard over Wi-Fi or Tailscale, with no account and no cloud.">
+<meta property="og:url" content="https://kdanet.github.io/syncliko/">
+<meta property="og:image" content="https://kdanet.github.io/syncliko/icon-512.png">
+<link rel="canonical" href="https://kdanet.github.io/syncliko/">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="site.css">
+<style>
+/* Landing page styles on top of site.css. Layout: the headline and the scene (a phone and a MacBook
+   passing a clip), then a narrow editorial column. The text-selection highlight is the motif.
+   The technical details live on how-it-works.html. */
+:root {
+  --toolbar: #ffffff;           /* Android floating text toolbar */
+  --bezel: #16171f;           /* device frame, dark in both themes */
+  --wall: #e3e6f2;
+  /* MacBook and Android hardware in the hero */
+  --glass: #0c0d12;           /* screen glass and bezels */
+  --alu-hi: #e7e9ef; --alu-lo: #b9bcc7;   /* aluminium deck */
+  --wall-1: #a9b4ff; --wall-2: #5d68e0; --wall-3: #e9ecff;   /* desktop picture */
+  --mbar: rgba(255, 255, 255, 0.62); --mbar-ink: #12131a;    /* translucent menu bar and Dock */
+  --side: #eef0f5; --note-sel: #f8dd7c; --win-edge: rgba(10, 12, 30, 0.14);
+  --grid: rgba(18, 19, 26, 0.05);
+  --map: #e8ebf2; --road: #ffffff; --park: #d5ecd9;
+  --stream-plain: #2f3ab8; --stream-cipher: #8f98ea; --stream-glow: rgba(74, 86, 209, 0.35); --spill: rgba(74, 86, 209, 0.2);
+  --tl-r: #ff5f57; --tl-y: #febc2e; --tl-g: #28c840;         /* window buttons, same in both themes */
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --toolbar: #2a2c3a; --bezel: #2c2e3c; --wall: #232534;
+   --glass: #050608; --alu-hi: #4a4d5a; --alu-lo: #2b2d37; --wall-1: #5b66d6; --wall-2: #232a6e; --wall-3: #141633; --mbar: rgba(22, 24, 34, 0.6); --mbar-ink: #eceef6; --side: #20222e; --note-sel: #6a5717; --win-edge: rgba(255, 255, 255, 0.1); --grid: rgba(255, 255, 255, 0.045); --map: #1b1d26; --road: #2b2e3a; --park: #1d2b24; --stream-plain: #eef0ff; --stream-cipher: #8f9bff; --stream-glow: rgba(140, 150, 255, 0.9); --spill: rgba(100, 110, 255, 0.45);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --toolbar: #2a2c3a; --bezel: #2c2e3c; --wall: #232534;
+   --glass: #050608; --alu-hi: #4a4d5a; --alu-lo: #2b2d37; --wall-1: #5b66d6; --wall-2: #232a6e; --wall-3: #141633; --mbar: rgba(22, 24, 34, 0.6); --mbar-ink: #eceef6; --side: #20222e; --note-sel: #6a5717; --win-edge: rgba(255, 255, 255, 0.1); --grid: rgba(255, 255, 255, 0.045); --map: #1b1d26; --road: #2b2e3a; --park: #1d2b24; --stream-plain: #eef0ff; --stream-cipher: #8f9bff; --stream-glow: rgba(140, 150, 255, 0.9); --spill: rgba(100, 110, 255, 0.45);
+  color-scheme: dark;
+}
+
+/* ---------- Hero ---------- */
+.hero { padding-block: clamp(28px, 6vw, 72px) clamp(40px, 7vw, 96px); }
+/* One left-aligned column of copy (two-line headline, lede, downloads), then the scene
+   full width underneath, so the phone and the MacBook can stand apart with room for the clip. */
+.hero .wrap { display: grid; grid-template-columns: minmax(0, 1fr); }
+.hero h1 { margin-bottom: 24px; }
+.hero-side .lede { max-width: 46ch; margin-bottom: 28px; }
+@media (max-width: 920px) { .hero .wrap { grid-template-columns: 1fr; } }
+
+h1 {
+  font: 800 var(--step-4)/1.08 var(--display);
+  letter-spacing: -0.035em;
+  margin: 0 0 28px;
+  text-wrap: balance;
+}
+h1 .line { display: block; }
+/* "Copy" drawn as an Android text selection. The highlight hugs the letters' ink (from the top of
+   the C to the bottom of the y) with an even margin on every side, instead of the font's content
+   area. Offsets are in em from the word's own box; the defaults fit SF Pro, and a script refines
+   them for whatever font the system actually used. */
+.sel {
+  --hl-t: 0.113em; --hl-b: -0.103em; --hl-l: -0.045em; --hl-r: -0.115em; --hd: 0.2em;
+  position: relative; display: inline-block; isolation: isolate;
+}
+.sel .hl {
+  position: absolute; z-index: -1;
+  top: var(--hl-t); bottom: var(--hl-b); left: var(--hl-l); right: var(--hl-r);
+  background: var(--select); border-radius: 0.04em;
+}
+/* Teardrop handles: the point touches the highlight's bottom corner, the round end hangs below. */
+.sel .hd {
+  position: absolute; top: calc(100% - var(--hl-b)); width: var(--hd); height: var(--hd);
+  background: var(--handle);
+}
+.sel .hd-l { left: calc(var(--hl-l) - var(--hd)); border-radius: 50% 0 50% 50%; }
+.sel .hd-r { left: calc(100% - var(--hl-r)); border-radius: 0 50% 50% 50%; }
+.sel .hd { transition: transform 0.35s cubic-bezier(0.3, 0.7, 0.2, 1), opacity 0.25s ease; }
+.sel .hd-l { transform-origin: 100% 0; }
+.sel .hd-r { transform-origin: 0 0; }
+/* Once on load the selection is dragged across the word, the way a long-press then drag does it.
+   Fill "backwards" only, so afterwards the handles go back to their transitions. */
+@media (prefers-reduced-motion: no-preference) {
+  .sel .hl { animation: sel-grow 0.75s cubic-bezier(0.3, 0.7, 0.2, 1) 0.45s backwards; }
+  .sel .hd-l { animation: hd-in 0.25s ease-out 0.3s backwards; }
+  .sel .hd-r { animation: hd-in 0.25s ease-out 0.3s backwards, sel-drag 0.75s cubic-bezier(0.3, 0.7, 0.2, 1) 0.45s backwards; }
+}
+@keyframes sel-grow { from { right: calc(100% - var(--hl-l)); } }
+@keyframes sel-drag { from { left: var(--hl-l); } }
+@keyframes hd-in { from { opacity: 0; transform: scale(0.4); } }
+
+/* The headline mirrors itself: "Copy on Android. / Paste on your Mac ⌘V" ⇄ "Copy on Mac ⌘C /
+   Paste on your Android." The platform words decode through bytes; the line that names the Mac
+   carries the keycap, the other one the full stop. Mac text selection has no handles. */
+.flip { display: block; }
+/* On narrow screens the second line always breaks after "on", so both states have the same height. */
+.nb { display: none; }
+@media (max-width: 640px) { .nb { display: inline; } }
+.slot, .tail { display: inline-block; white-space: nowrap; vertical-align: baseline; }
+.slot { clip-path: inset(-0.4em -0.05em -0.4em 0); }
+.flip.anim .slot, .flip.anim .tail { transition: width 0.55s cubic-bezier(0.3, 0.7, 0.2, 1); }
+.slot .nz { color: var(--accent); }
+/* The full stop and the keycap sit side by side on a strip that slides inside the tail's window. */
+.tail { clip-path: inset(-0.5em 0 -0.5em 0); }
+.strip { display: inline-block; white-space: nowrap; }
+.flip.anim .strip { transition: transform 0.55s cubic-bezier(0.3, 0.7, 0.2, 1); }
+.flip.anim .strip > * { transition: opacity 0.3s ease; }
+.tail:not(.k) .kbd, .tail.k .stop { opacity: 0; }
+/* Without the script (or before it measures) only the visible end of each line takes up space. */
+.flip:not(.ready) .tail:not(.k) .kbd, .flip:not(.ready) .tail.k .stop { position: absolute; visibility: hidden; }
+.flip[data-dir="ma"] .sel .hd { opacity: 0; transform: scale(0); }
+.kbd {
+  display: inline-grid; place-items: center;
+  font: 600 0.42em/1 var(--text);
+  letter-spacing: 0;
+  min-width: 2.1em; height: 1.55em; padding-inline: 0.4em;
+  border: 1px solid var(--line); border-bottom-width: 3px;
+  background: var(--raised); color: var(--ink);
+  border-radius: 0.32em;
+  vertical-align: 0.42em; margin-left: 0.18em;
+}
+.lede { font-size: var(--step-1); line-height: 1.5; color: var(--muted); max-width: 34ch; margin: 0 0 32px; text-wrap: pretty; }
+.lede strong { color: var(--ink); font-weight: 500; }
+
+.ctas { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.fine { margin-top: 18px; font: 400 var(--step--1)/1.5 var(--mono); color: var(--muted); }
+
+/* ---------- Demo stage ----------
+   The product is "Android → macOS", so the scene says it in hardware: an Android phone and, a step
+   apart, a MacBook Pro 14" in its real proportions (lid 1.45:1, thin bezels, notch, a base a touch
+   wider than the lid) with one Notes window open. The clip travels across the gap between them, both
+   ways. The stage is a size container and the scene is sized in em off a cqw base, so it scales as one
+   picture. Under it, in normal type, a caption row names both devices and logs the last trip. */
+.demo { grid-column: 1 / -1; display: grid; gap: 18px; width: 100%; max-width: 1180px; min-width: 0; justify-self: center; margin-top: clamp(20px, 3.5vw, 44px); }
+.stage { position: relative; width: 100%; aspect-ratio: 100 / 46.5; container-type: inline-size; min-width: 0; }
+.scene { position: absolute; inset: 0; font-size: 1.45cqw; }
+
+/* MacBook Pro, front view, kept to a clean silhouette: a black lid with even thin bezels sitting
+   straight on a thin aluminium base that is a touch wider, with a dark seam and a shallow scoop. */
+.laptop { position: absolute; left: 31.4%; width: 67.2%; top: 0; height: 98.6%; }
+.lid {
+  position: absolute; left: 2.38%; width: 95.24%; top: 0; height: 96.96%;
+  padding: 0.55em 0.55em 0.75em; border-radius: 1em 1em 0.3em 0.3em; background: var(--glass);
+  box-shadow: 0 2.6em 4em -3.2em rgba(10, 12, 30, 0.45);
+}
+.base {
+  position: absolute; left: 0; width: 100%; top: 96.96%; height: 3.04%;
+  border-radius: 0 0 1em 1em / 0 0 0.75em 0.75em;
+  background: linear-gradient(var(--alu-hi) 35%, var(--alu-lo));
+  box-shadow: inset 0 0.12em 0 rgba(0, 0, 0, 0.28), 0 1.2em 1.6em -1.2em rgba(10, 12, 30, 0.4);
+}
+.base::after { content: ""; position: absolute; left: 50%; top: 0; width: 13%; height: 42%; transform: translateX(-50%); background: var(--alu-lo); border-radius: 0 0 0.55em 0.55em; opacity: 0.7; }
+
+.desk {
+  position: relative; height: 100%; border-radius: 0.5em; overflow: hidden;
+  background:
+    radial-gradient(70% 90% at 92% 8%, var(--wall-1) 0%, transparent 62%),
+    radial-gradient(85% 95% at 8% 100%, var(--wall-2) 0%, transparent 66%),
+    radial-gradient(60% 60% at 45% 55%, var(--wall-3) 0%, transparent 70%),
+    var(--wall-3);
+}
+.notch { position: absolute; left: 50%; top: 0; width: 15%; height: 1.61em; transform: translateX(-50%); background: var(--glass); border-radius: 0 0 0.55em 0.55em; z-index: 3; }
+
+/* Menu bar */
+.mbar {
+  position: relative; z-index: 2; display: flex; align-items: center; gap: 1.25em;
+  height: 2.3em; padding: 0 1.3em; font: 500 0.7em/1 var(--text);
+  background: var(--mbar); color: var(--mbar-ink); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+}
+.mbar b { font-weight: 700; }
+/* The Apple menu. The logo is a character in Apple's system font (U+F8FF), so it exists only on Apple
+   devices; elsewhere the script removes it rather than show an empty box. */
+.mbar .apple { font: 400 1.3em/1 -apple-system, BlinkMacSystemFont, sans-serif; margin-right: -0.1em; transform: translateY(-0.04em); }
+.mbar .tray { margin-left: auto; display: flex; align-items: center; gap: 1.05em; font-variant-numeric: tabular-nums; }
+.mbar svg { width: 1.25em; height: 1.25em; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+/* Syncliko's menu bar glyph, the same drawing as MenuBarIcon in the Mac app: the S, solid. */
+.mbar svg.sy { width: 1.05em; height: 1.35em; flex: none; display: block; fill: none; stroke: var(--mbar-ink); stroke-linecap: butt; overflow: visible; transform-origin: 50% 50%; }
+.sy.ping { animation: ping 0.9s ease-out; }
+@keyframes ping { 0% { stroke: var(--accent); transform: scale(1); } 35% { stroke: var(--accent); transform: scale(1.3); } 100% { transform: scale(1); } }
+.bat { width: 1.9em; height: 0.95em; border: 1px solid currentColor; border-radius: 0.28em; position: relative; opacity: 0.9; }
+.bat::after { content: ""; position: absolute; inset: 0.14em 18% 0.14em 0.14em; border-radius: 0.1em; background: currentColor; }
+
+/* One note in its own window, the way Notes opens a note on double-click: window buttons, a small
+   toolbar, no title-bar rule, large corner radius and a soft shadow. */
+.win {
+  position: absolute; left: 13%; right: 13%; top: 11%; bottom: 33%;
+  display: flex; flex-direction: column;
+  background: var(--raised); border-radius: 1.1em; overflow: hidden;
+  box-shadow: 0 0 0 1px var(--win-edge), 0 2em 3.6em -1.6em rgba(10, 12, 30, 0.5);
+}
+.win-head { display: flex; align-items: center; justify-content: space-between; padding: 0.9em 1.1em 0.3em; }
+.lights { display: flex; gap: 0.48em; }
+.lights i { width: 0.8em; height: 0.8em; border-radius: 50%; }
+.lights i:nth-child(1) { background: var(--tl-r); }
+.lights i:nth-child(2) { background: var(--tl-y); }
+.lights i:nth-child(3) { background: var(--tl-g); }
+.tools { display: flex; gap: 1em; color: var(--muted); }
+.tools svg { width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.notes-body { padding: 0.1em 1.5em 1em; font-size: 1.05em; line-height: 1.7; color: var(--muted); min-width: 0; }
+.notes-body .when { display: block; text-align: center; font-size: 0.72em; margin-bottom: 0.5em; }
+.notes-body .t { display: block; color: var(--ink); font: 700 1.4em/1.25 var(--text); margin-bottom: 0.25em; }
+.notes-body .row { display: block; white-space: nowrap; color: var(--ink); }
+.msel { border-radius: 2px; transition: background 0.6s ease; }
+.msel.on { background: var(--select); }
+.caret { display: inline-block; width: 1.5px; height: 1.1em; background: var(--accent); vertical-align: -0.2em; margin-left: 1px; }
+
+/* Dock */
+.dock {
+  position: absolute; left: 50%; bottom: 1.6%; transform: translateX(-50%); z-index: 1;
+  display: flex; align-items: center; gap: 0.42em; padding: 0.4em 0.48em 0.55em; border-radius: 1.1em;
+  background: var(--mbar); box-shadow: 0 0 0 1px var(--win-edge);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+}
+.dock i { width: 2em; height: 2em; border-radius: 0.52em; background: var(--c); position: relative; }
+.dock i.run::after { content: ""; position: absolute; left: 50%; bottom: -0.3em; width: 0.18em; height: 0.18em; border-radius: 50%; background: var(--mbar-ink); transform: translateX(-50%); }
+.dock .sep { width: 1px; height: 1.9em; background: var(--win-edge); margin: 0 0.1em; }
+
+/* Android phone: punch-hole camera, gesture bar. Stands on its own, left of the MacBook. */
+.phone {
+  position: absolute; left: 3%; width: 19%; top: 14%; bottom: 0; z-index: 3;
+  padding: 0.3em; border-radius: 1.75em; background: var(--glass);
+  box-shadow: 0 0 0 0.12em var(--alu-lo), 0 2.2em 3.2em -1.8em rgba(10, 12, 30, 0.55);
+}
+.phone-screen { position: relative; height: 100%; border-radius: 1.47em; background: var(--raised); display: flex; flex-direction: column; overflow: hidden; }
+.p-status { position: relative; display: flex; justify-content: space-between; align-items: center; padding: 0.9em 1.3em 0.4em; font: 600 0.72em/1 var(--text); color: var(--ink); }
+.p-status .cam { position: absolute; left: 50%; top: 0.55em; width: 1.2em; height: 1.2em; margin-left: -0.6em; border-radius: 50%; background: var(--glass); }
+.p-status .bat { width: 1.7em; height: 0.85em; }
+.p-head { display: flex; align-items: center; gap: 0.6em; padding: 0.45em 0.85em 0.7em; border-bottom: 1px solid var(--line); }
+.ava { width: 2.1em; height: 2.1em; border-radius: 50%; background: var(--select); display: grid; place-items: center; font: 700 0.9em/1 var(--display); color: var(--ink); flex: none; }
+.who { display: flex; flex-direction: column; gap: 0.2em; font: 600 0.9em/1.1 var(--text); min-width: 0; }
+.who small { font: 400 0.85em/1 var(--text); color: var(--signal); }
+.p-chat { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: 0.38em; padding: 0.5em 0.55em; min-height: 0; overflow: hidden; }
+.b { max-width: 90%; padding: 0.5em 0.7em; border-radius: 1em; font-size: 0.84em; line-height: 1.35; background: var(--code-bg); color: var(--ink); }
+.b.me { align-self: flex-end; background: var(--accent); color: var(--paper); border-bottom-right-radius: 0.35em; }
+.b.them { border-bottom-left-radius: 0.35em; }
+.pick { white-space: nowrap; position: relative; border-radius: 2px; transition: background 0.25s ease; }
+.pick::before, .pick::after { content: ""; position: absolute; bottom: -0.62em; width: 0.62em; height: 0.62em; background: var(--handle); opacity: 0; transition: opacity 0.2s ease; }
+.pick::before { left: -0.6em; border-radius: 50% 0 50% 50%; }
+.pick::after { right: -0.6em; border-radius: 0 50% 50% 50%; }
+.pick.on { background: var(--select); }
+.pick.on::before, .pick.on::after { opacity: 1; }
+/* Android's floating text toolbar: a compact opaque bar that hugs its actions, lifted by a shadow and
+   placed just above the selection (see above()). */
+.p-tools {
+  position: absolute; left: 0; top: 0; z-index: 7;
+  display: flex; align-items: center; padding: 0.22em;
+  background: var(--toolbar); color: var(--ink); border-radius: 0.75em;
+  box-shadow: 0 0 0 1px var(--line), 0 0.5em 1.2em -0.3em rgba(8, 10, 24, 0.45);
+  font: 500 0.7em/1 var(--text); white-space: nowrap;
+  opacity: 0; transform: translateY(0.35em) scale(0.96); transform-origin: 50% 100%;
+  transition: opacity 0.18s ease, transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.p-tools span { padding: 0.62em 0.78em; border-radius: 0.55em; transition: background 0.15s ease; }
+.p-tools .more { padding-inline: 0.5em; font-weight: 700; color: var(--muted); }
+.p-tools.show { opacity: 1; transform: none; }
+.p-tools.pressed .copy { background: color-mix(in srgb, var(--accent) 26%, transparent); }
+.p-input { position: relative; display: flex; align-items: center; gap: 0.4em; padding: 0 0.55em 0.35em; }
+.field {
+  flex: 1; min-width: 0; height: 2.3em; padding: 0 0.85em; border-radius: 1.15em;
+  display: flex; align-items: center; background: var(--code-bg);
+  font-size: 0.82em; color: var(--muted); white-space: nowrap; overflow: hidden;
+}
+.field .typed { color: var(--ink); border-radius: 2px; transition: background 0.6s ease; }
+.field .typed.fresh { background: var(--select); }
+.send { width: 1.9em; height: 1.9em; border-radius: 50%; background: var(--accent); flex: none; }
+.p-paste {
+  position: absolute; left: 0; top: 0; z-index: 4;
+  padding: 0.6em 0.8em; border-radius: 0.6em; background: var(--ink); color: var(--paper);
+  font: 500 0.76em/1 var(--text); opacity: 0; transform: translateY(0.4em); transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.p-paste.show { opacity: 1; transform: none; }
+.gesture { flex: none; width: 34%; height: 0.24em; margin: 0.25em auto 0.55em; border-radius: 1em; background: var(--ink); opacity: 0.5; }
+
+/* The trip between devices */
+.key {
+  position: absolute; z-index: 5; font: 600 1.05em/1 var(--text);
+  padding: 0.45em 0.6em; border: 1px solid var(--line); border-bottom-width: 3px; border-radius: 0.5em;
+  background: var(--raised); color: var(--ink);
+  opacity: 0; transform: translateY(0.35em); transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.key.show { opacity: 1; transform: none; }
+
+/* Caption row: which devices, which way, how fast. */
+
+@media (prefers-reduced-motion: no-preference) {
+  .caret { animation: blink 1.1s steps(1) infinite; }
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* Scene extras switched on by the hero look below. */
+.ripple, .floor, .stream { display: none; }
+.stream { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; }
+.ripple { position: absolute; z-index: 5; width: 2.4em; height: 2.4em; margin: -1.2em 0 0 -1.2em; border-radius: 50%; border: 2px solid var(--accent); opacity: 0; pointer-events: none; }
+.ripple.go { animation: ripple 0.9s ease-out; }
+@keyframes ripple { from { transform: scale(0.3); opacity: 0.9; } to { transform: scale(2.8); opacity: 0; } }
+.floor { position: absolute; left: 6%; right: 6%; top: 100%; height: 1.8em; z-index: -1; pointer-events: none; background: radial-gradient(50% 55% at 50% 0, rgba(0, 0, 0, 0.55), transparent 100%); filter: blur(3px); }
+
+/* Hero scene look. No panel: the scene sits on the page and its screens follow the page theme, while
+   the hardware stays space black (glass sheen, dark aluminium, titanium-like phone frame). The clip
+   travels as its UTF-8 bytes (see flowBytes), coloured from the --stream-* tokens. */
+.v-dark .lid { box-shadow: 0 0 0 0.09em #3b3d47, 0 0 0 0.17em #0d0e12, 0 3em 5em -2.8em rgba(10, 12, 30, 0.55); }
+.v-dark .desk::after, .v-dark .phone-screen::after { content: ""; position: absolute; inset: 0; z-index: 6; pointer-events: none; background: linear-gradient(118deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 34%); border-radius: inherit; }
+.v-dark .base { background: linear-gradient(#5a5c65 0, #2c2e35 22%, #17181d 100%); box-shadow: inset 0 0.07em 0 rgba(255, 255, 255, 0.24), 0 1.2em 1.6em -1em rgba(10, 12, 30, 0.5); }
+.v-dark .base::after { background: #0f1014; opacity: 1; }
+.v-dark .phone { padding: 0.24em; background: linear-gradient(150deg, #60636e 0%, #1d1e24 30%, #2e3038 72%, #4d505a 100%); box-shadow: 0 2.4em 3.4em -1.8em rgba(10, 12, 30, 0.55); }
+.v-dark .phone-screen { border: 0.18em solid #040406; }
+.v-dark .phone::before { content: ""; position: absolute; right: -0.13em; top: 21%; width: 0.13em; height: 8%; border-radius: 0 0.1em 0.1em 0; background: #3a3c46; box-shadow: 0 3.4em 0 #3a3c46; }
+.v-dark .floor { display: block; background: radial-gradient(50% 55% at 50% 0, rgba(10, 12, 30, 0.35), transparent 100%); }
+.v-dark .ripple { display: block; }
+.v-spot .stage { margin-bottom: 2.2em; }
+.v-spot .laptop { -webkit-box-reflect: below 0.4em linear-gradient(transparent 88%, rgba(255, 255, 255, 0.16)); }
+.v-spot .laptop::before { content: ""; position: absolute; left: 10%; right: 10%; top: 30%; bottom: -14%; z-index: -1; background: radial-gradient(closest-side, var(--spill), transparent); filter: blur(28px); }
+.v-spot .phone { -webkit-box-reflect: below 0.4em linear-gradient(transparent 90%, rgba(255, 255, 255, 0.14)); }
+.v-spot .stream { display: block; }
+
+
+/* ---------- Scenario playlist ----------
+   Five scenes share one phone and one MacBook. Phone apps switch like Android does (the old one slides
+   up, the next rises in); Mac windows minimise into the Dock and the next one opens out of it. */
+.apps { position: relative; flex: 1; min-height: 0; }
+.app { position: absolute; inset: 0; display: flex; flex-direction: column; background: var(--raised); transition: transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.4s ease; }
+.app:not(.on) { transform: translateY(14%); opacity: 0; pointer-events: none; }
+.app.gone { transform: translateY(-9%); opacity: 0; }
+.win { transform-origin: 50% 135%; transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.45s ease; }
+.win:not(.on) { transform: translateY(16%) scale(0.12); opacity: 0; pointer-events: none; }
+.dock i.bounce { animation: bounce 0.7s ease; }
+@keyframes bounce { 30% { transform: translateY(-0.7em); } 55% { transform: translateY(0); } 75% { transform: translateY(-0.25em); } }
+
+/* Values that a paste fills in, and things that appear once it has */
+.val { border-radius: 2px; transition: background-color 0.6s ease; }
+.val.fresh { background-color: var(--select); }
+.ok:not([hidden]) { animation: rise 0.45s ease both; }
+@keyframes rise { from { opacity: 0; transform: translateY(0.4em); } }
+.tap { border-radius: 0.3em; transition: background 0.25s ease; }
+.tap.on { background: var(--select); }
+
+/* Phone: ride app */
+.map {
+  flex: 1; position: relative; background-color: var(--map);
+  background-image:
+    radial-gradient(28% 20% at 74% 30%, var(--park) 0 98%, transparent 100%),
+    linear-gradient(118deg, transparent 47%, var(--road) 47% 51%, transparent 51%),
+    linear-gradient(28deg, transparent 58%, var(--road) 58% 61%, transparent 61%),
+    linear-gradient(90deg, transparent 30%, var(--road) 30% 32.5%, transparent 32.5%),
+    linear-gradient(0deg, transparent 64%, var(--road) 64% 66%, transparent 66%);
+}
+.map .me { position: absolute; left: 40%; top: 62%; width: 0.8em; height: 0.8em; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 0.35em rgba(74, 86, 209, 0.22); }
+.map .dest { position: absolute; left: 68%; top: 22%; width: 0.9em; height: 0.9em; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); background: #e5484d; }
+.sheet { position: relative; margin-top: -1em; display: flex; flex-direction: column; gap: 0.5em; padding: 0.9em 0.7em 0.8em; background: var(--raised); border-radius: 1.2em 1.2em 0 0; box-shadow: 0 -0.6em 1.4em -1em rgba(10, 12, 30, 0.3); }
+.sheet-h { font: 700 0.95em/1.2 var(--text); color: var(--ink); }
+.sheet .field { flex: none; }
+.okchip { font: 600 0.66em/1.2 var(--text); color: var(--signal); }
+.recent { font-size: 0.64em; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Phone: authenticator */
+.a-head { padding: 0.5em 0.9em 0.7em; font: 700 1em/1.2 var(--text); color: var(--ink); }
+.acct { display: flex; align-items: center; justify-content: space-between; gap: 0.5em; padding: 0.7em 0.9em; border-top: 1px solid var(--line); }
+.acct small { display: block; font-size: 0.6em; color: var(--muted); margin-bottom: 0.2em; }
+.acct .code { font: 600 1.25em/1.1 var(--mono); letter-spacing: 0.04em; color: var(--accent); padding: 0 0.15em; }
+.ring { flex: none; width: 1.3em; height: 1.3em; border-radius: 50%; background: conic-gradient(var(--accent) 0 68%, var(--line) 0); -webkit-mask: radial-gradient(circle, transparent 50%, #000 52%); mask: radial-gradient(circle, transparent 50%, #000 52%); }
+
+/* Phone: gallery grid, and the viewer that opens out of the tapped tile */
+.app-photo { background: var(--raised); }
+.gal { display: flex; flex-direction: column; height: 100%; }
+.gal-head { display: flex; align-items: baseline; justify-content: space-between; padding: 0.5em 0.9em 0.6em; }
+.gal-head b { font: 700 1em/1.2 var(--text); color: var(--ink); }
+.gal-head span { font-size: 0.62em; color: var(--muted); }
+.gal-head.sub { padding: 0.7em 0.9em 0.4em; }
+.gal { overflow: hidden; }
+.gal-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.18em; padding: 0 0.18em; }
+.tile { display: block; aspect-ratio: 1; overflow: hidden; transition: transform 0.18s ease, box-shadow 0.18s ease; }
+.tile svg { display: block; width: 100%; height: 100%; }
+.tile.tap { transform: scale(0.9); box-shadow: 0 0 0 0.16em var(--handle); }
+/* Full screen, over the status bar too (only the camera cutout stays on top), with nothing but the photo. */
+.viewer { position: absolute; inset: -3em 0 -1.4em; z-index: 4; background: #0b0c10; opacity: 0; transform: scale(0.3); pointer-events: none; transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease; }
+.viewer.open { opacity: 1; transform: none; }
+.shot {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  background: radial-gradient(62% 40% at 50% 54%, rgba(255, 249, 240, 0.85), transparent 72%), linear-gradient(172deg, #fff0de, #f7c69c);
+  transition: filter 0.25s ease;
+}
+.shot svg { width: 100%; height: auto; transform: translateY(6%); }
+.thumb svg { display: block; width: 100%; height: 100%; }
+/* Long-press: the photo stays full screen and dims slightly under the finger, then the toolbar appears. */
+.shot.on { filter: brightness(0.94); }
+.p-status .cam { z-index: 8; }
+.gesture { position: relative; z-index: 8; transition: background 0.3s ease; }
+/* Over a light photo the gesture bar turns dark, as Android does. */
+.phone-screen:has(.viewer.open) .gesture { background: #000; opacity: 0.35; }
+
+/* Phone: shared toast */
+.p-toast {
+  position: absolute; left: 50%; bottom: 2.2em; z-index: 4; transform: translate(-50%, 0.4em); white-space: nowrap;
+  padding: 0.6em 0.9em; border-radius: 2em; background: var(--ink); color: var(--paper); font: 500 0.6em/1 var(--text);
+  opacity: 0; transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.p-toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* Mac: browser pages and the team chat */
+.wbar { display: flex; align-items: center; gap: 0.8em; padding: 0.8em 0.95em 0.5em; }
+.wbar .url { flex: 1; max-width: 55%; margin: 0 auto; padding: 0.5em 1em; border-radius: 0.8em; background: var(--code-bg); font: 500 0.6em/1 var(--text); color: var(--muted); text-align: center; transform: translateX(-1.6em); }
+.wbody { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 0.4em; padding: 0.4em 1.6em 1em; font-size: 0.86em; color: var(--ink); }
+.wbody.center { align-items: center; text-align: center; }
+.wbody h6 { margin: 0.1em 0 0; font: 700 1.4em/1.2 var(--text); color: var(--ink); }
+.wbody .muted { font-size: 0.82em; color: var(--muted); }
+.wbody .lbl { margin-top: 0.4em; font: 500 0.66em/1 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.logo { width: 2em; height: 2em; border-radius: 50%; background: linear-gradient(150deg, #8f99ff, #4a56d1); }
+.logo.sq { border-radius: 0.5em; background: linear-gradient(150deg, #5ad19a, #12915a); }
+.otp { display: flex; gap: 0.4em; margin-top: 0.5em; }
+.otp i { width: 1.9em; height: 2.3em; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 0.45em; font: 600 1em/1 var(--mono); font-style: normal; background: var(--raised); }
+.wfield { display: flex; align-items: center; gap: 0.6em; width: 13em; height: 2.2em; margin-top: 0.4em; padding: 0 0.8em; border: 1px solid var(--line); border-radius: 0.5em; font: 500 0.9em/1 var(--mono); color: var(--muted); }
+.wfield .val { color: var(--ink); }
+.okline { font-size: 0.82em; font-weight: 600; color: var(--signal); }
+.w-chat .wbody { flex-direction: row; align-items: stretch; gap: 0; padding: 0; }
+.chat-side { width: 27%; display: flex; flex-direction: column; gap: 0.35em; padding: 0.8em 0.7em; background: var(--side); font-size: 0.72em; color: var(--muted); }
+.chat-side b { color: var(--ink); margin-bottom: 0.3em; }
+.chat-side .cur { margin: 0 -0.4em; padding: 0.25em 0.4em; border-radius: 0.4em; background: var(--win-edge); color: var(--ink); }
+.chat-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.6em; padding: 0.9em 1em; }
+.msg { font-size: 0.78em; color: var(--ink); }
+.msg b { display: block; font-size: 0.9em; margin-bottom: 0.1em; }
+.composer { margin-top: auto; display: flex; align-items: center; gap: 0.6em; min-height: 2.6em; padding: 0.45em 0.7em; border: 1px solid var(--line); border-radius: 0.6em; font-size: 0.74em; color: var(--muted); }
+.thumb { width: 6.4em; height: 6.4em; border-radius: 0.5em; overflow: hidden; box-shadow: 0 0.3em 0.8em -0.4em rgba(10, 12, 30, 0.35); background-image: linear-gradient(#fde7c8, #f2b083); }
+.thumb.fresh { box-shadow: 0 0 0 0.2em var(--select); }
+
+/* Case title over the scene: what is copied, then where it is pasted, in two tones. On a scene change
+   the words leave blurred and the new ones rise one by one. The script reserves the height of the
+   longest title so the scene never moves. */
+.case {
+  margin: 0 0 clamp(16px, 3vw, 40px);
+  font: 700 clamp(1.45rem, 1rem + 1.7vw, 2.35rem)/1.14 var(--display); letter-spacing: -0.025em;
+  color: var(--ink); text-wrap: balance;
+}
+.case .c-rest { color: var(--muted); }
+.case .w { display: inline-block; }
+@media (prefers-reduced-motion: no-preference) {
+  .case .w { animation: case-in 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) calc(var(--i) * 45ms) backwards; }
+  .case.out .w {
+    opacity: 0; transform: translateY(-0.2em); filter: blur(6px);
+    transition: opacity 0.25s ease, transform 0.3s ease, filter 0.3s ease; transition-delay: calc(var(--i) * 18ms);
+  }
+}
+@keyframes case-in { from { opacity: 0; transform: translateY(0.45em); filter: blur(8px); } }
+
+/* Phones: the devices stack (MacBook on top, the phone under it) instead of standing side by side, so
+   both can be large. Type is rescaled so each device keeps exactly its desktop layout inside:
+   the laptop stays 46em wide and the phone 13em wide, whatever the screen. */
+@media (max-width: 640px) {
+  .stage { aspect-ratio: 100 / 158; }
+  .scene { font-size: 1.99cqw; }
+  .laptop { left: 4%; width: 92%; top: 0; height: 39.7%; }
+  .phone { left: 30%; width: 40%; top: 46.7%; bottom: 0; font-size: 1.53em; }
+}
+
+/* Reduced motion: no app/window transitions or decorative loops (the scene shows one still frame). */
+@media (prefers-reduced-motion: reduce) {
+  .app, .win, .viewer, .tile, .p-tools, .p-paste, .p-toast, .key, .val { transition: none !important; }
+  .ok, .dock i.bounce, .ripple.go, .sy.ping, .caret { animation: none !important; }
+}
+/* Off-screen, the scene's CSS loops stop too (the script pauses between scenes). */
+.demo.paused * { animation-play-state: paused !important; }
+
+/* Both ways: real copy-paste situations as one framed ledger. Each row shows the route as small
+   device tokens (phone, Mac) and the moment in two lines: what you copy, then how. */
+.routes { list-style: none; padding: 0; margin: 32px 0 0; border: 1px solid var(--line); border-radius: var(--radius); background: var(--raised); overflow: hidden; }
+.route-row { display: grid; grid-template-columns: 17rem minmax(0, 1fr); gap: 14px 28px; align-items: center; padding: 22px 24px; }
+.route-row + .route-row { border-top: 1px solid var(--line); }
+.path { display: flex; align-items: flex-start; }
+/* Each device is a tile with its icon and the name under it; arrows between tiles show the direction. */
+.dev { display: flex; flex-direction: column; align-items: center; gap: 7px; width: 4.4rem; font: 500 0.82rem/1.2 var(--text); color: var(--muted); white-space: nowrap; }
+.dev .tile { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 13px; background: var(--code-bg); border: 1px solid var(--line); }
+.dev svg { width: 24px; height: 24px; fill: none; stroke: var(--accent); stroke-width: 1.5; stroke-linejoin: round; stroke-linecap: round; }
+.path .to { display: flex; align-items: center; height: 46px; color: var(--muted); }
+.path .to svg { width: 26px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.route-row .what { display: block; font: 600 var(--step-1)/1.3 var(--text); }
+.route-row .how { display: block; margin-top: 2px; color: var(--muted); font-size: var(--step--1); }
+kbd { font: 500 0.86em/1 var(--text); padding: 2px 5px 1px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; background: var(--paper); color: var(--ink); white-space: nowrap; }
+@media (max-width: 760px) { .route-row { grid-template-columns: 1fr; padding: 18px; } }
+
+/* Three ways to send from Android, as a comparison table. On wide screens a label column sits on the
+   left and every mode is a column; subgrid keeps each row aligned across the columns. On narrow
+   screens each mode becomes its own card with the labels inline. */
+.ways { display: grid; grid-template-columns: 9.5rem repeat(3, minmax(0, 1fr)); grid-template-rows: auto repeat(5, auto); column-gap: 12px; margin-top: 36px; }
+.ways-labels, .way { grid-row: 1 / span 6; display: grid; grid-template-rows: subgrid; min-width: 0; }
+.ways-labels span { padding: 16px 0; border-top: 1px solid var(--line); font: 600 0.72rem/1.5 var(--mono); letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
+.ways-labels span:first-child { border-top: 0; }
+.way { border: 1px solid var(--line); border-radius: var(--radius); background: var(--raised); overflow: hidden; }
+.way.featured { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); background: color-mix(in srgb, var(--accent) 5%, var(--raised)); }
+.way-head { padding: 22px 20px 18px; display: flex; flex-direction: column; gap: 6px; }
+.way .tag { align-self: flex-start; font: 600 0.68rem/1 var(--mono); letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); padding: 5px 8px; border-radius: 999px; border: 1px solid var(--line); }
+.way.featured .tag { color: var(--paper); background: var(--accent); border-color: var(--accent); }
+.way h3 { margin: 6px 0 0; }
+.way-head p { margin: 0; color: var(--muted); font-size: var(--step--1); }
+.way dl { display: contents; }
+.way dl > div { padding: 16px 20px; border-top: 1px solid var(--line); font-size: var(--step--1); color: var(--muted); }
+.way dt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.way dd { margin: 0; }
+.way dd strong { display: block; color: var(--ink); font-weight: 600; margin-bottom: 2px; }
+.ways-foot { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 16px 40px; align-items: start; margin-top: 28px; }
+.ways-foot p { margin: 0; color: var(--muted); font-size: var(--step--1); }
+.ways-foot p + p { margin-top: 8px; }
+.ways-foot b { color: var(--ink); font-weight: 600; }
+.ways-foot code { font: 400 0.92em var(--mono); background: var(--code-bg); padding: 1px 5px; border-radius: 4px; }
+@media (max-width: 880px) {
+  .ways { display: flex; flex-direction: column; gap: 14px; }
+  .ways-labels { display: none; }
+  .way dt { position: static; width: auto; height: auto; overflow: visible; clip: auto; display: block; margin-bottom: 4px; font: 600 0.68rem/1.4 var(--mono); letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
+  .way dl { display: block; }
+  .ways-foot { grid-template-columns: 1fr; }
+}
+.cmd { display: flex; align-items: flex-start; gap: 8px; margin-top: auto; min-width: 0; }
+.cmd pre {
+  flex: 1; min-width: 0; margin: 0; white-space: pre-wrap; word-break: break-all;
+  font: 400 0.72rem/1.55 var(--mono); background: var(--code-bg); padding: 10px 12px; border-radius: 8px;
+}
+.copy-btn { all: unset; cursor: pointer; font: 500 0.72rem/1 var(--mono); padding: 9px 10px; border-radius: 8px; border: 1px solid var(--line); color: var(--muted); }
+.copy-btn:hover { color: var(--ink); border-color: var(--muted); }
+.copy-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* FAQ: native disclosure, one question per row. */
+.qa { margin-top: 24px; max-width: 820px; border-bottom: 1px solid var(--line); }
+.qa details { border-top: 1px solid var(--line); }
+.qa summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; gap: 16px; padding: 18px 0; font: 600 var(--step-0)/1.4 var(--text); color: var(--ink); }
+.qa summary::-webkit-details-marker { display: none; }
+.qa summary::after { content: ""; flex: none; width: 8px; height: 8px; margin: 0.45em 4px 0 0; border-right: 1.5px solid var(--muted); border-bottom: 1.5px solid var(--muted); transform: rotate(45deg); transition: transform 0.2s ease; }
+.qa details[open] summary::after { transform: rotate(-135deg); margin-top: 0.7em; }
+.qa summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+.qa details p { margin: 0 0 20px; max-width: 64ch; color: var(--muted); }
+
+/* Install */
+.install .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 28px; }
+@media (max-width: 760px) { .install .grid { grid-template-columns: 1fr; } }
+.platform { border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; background: var(--raised); display: flex; flex-direction: column; gap: 14px; }
+.platform ol { margin: 0; padding-left: 1.2em; color: var(--muted); }
+.platform li { margin-bottom: 8px; padding-left: 4px; }
+.platform .req { margin-top: auto; font: 400 0.76rem/1.5 var(--mono); color: var(--muted); }
+.platform .btn { align-self: flex-start; }
+.platform .btn-row { display: flex; flex-wrap: wrap; gap: 10px; }
+.platform .note { margin: -4px 0 0; font-size: var(--step--1); color: var(--muted); }
+.install .fine { margin-top: 18px; }
+
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top"><svg class="brand-mark" viewBox="0 0 100 100" aria-hidden="true"><rect class="mark-tile" width="100" height="100" rx="22"/><g transform="translate(50 50) scale(0.8) translate(-50 -50)" fill="none" stroke-width="13"><path class="mark-a" d="M66 22H50A14 14 0 0 0 50 50"/><path class="mark-b" d="M50 50A14 14 0 0 1 50 78H34"/></g></svg>Syncliko</a>
+    <nav aria-label="Sections">
+      <a href="#modes">Modes</a>
+      <a href="how-it-works.html">How it works</a>
+      <a href="#faq">FAQ</a>
+      <a href="https://github.com/kdanet/syncliko" rel="noopener">GitHub</a>
+      <a class="nav-cta" href="#install">Download</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <div class="hero">
+    <div class="wrap">
+      <div class="hero-head">
+        <h1><span class="sr-only">Copy on Android, paste on your Mac. And the other way round.</span><span class="flip" data-dir="am" aria-hidden="true"><span class="line"><span class="sel"><span class="hl"></span>Copy<span class="hd hd-l"></span><span class="hd hd-r"></span></span> on <span class="slot" data-am="Android" data-ma="Mac">Android</span><span class="tail"><span class="strip"><span class="stop">.</span><span class="kbd">⌘C</span></span></span></span><span class="line">Paste on <br class="nb">your <span class="slot" data-am="Mac" data-ma="Android">Mac</span><span class="tail k"><span class="strip"><span class="stop">.</span><span class="kbd">⌘V</span></span></span></span></span></h1>
+      </div>
+      <div class="hero-side">
+        <p class="lede">Copy text, a link or a photo on your Android phone and paste it on your Mac, or the other way round. The phone and the Mac talk to each other directly over Wi-Fi or Tailscale. <strong>No account, no cloud.</strong></p>
+        <div class="ctas">
+          <a class="btn primary" href="#install">Download for Android <small>APK · Android 12+</small></a>
+          <a class="btn" href="#install">Download for Mac <small>DMG · macOS 26+</small></a>
+        </div>
+        <p class="fine">Free · No account · Apple silicon Macs · v0.3.2</p>
+      </div>
+
+      <div class="demo v-dark v-spot">
+        <p class="case" aria-hidden="true" data-id="link"><span class="c-lead"><span class="w" style="--i:0">A</span> <span class="w" style="--i:1">link</span> <span class="w" style="--i:2">from</span> <span class="w" style="--i:3">a</span> <span class="w" style="--i:4">chat,</span></span> <span class="c-rest"><span class="w" style="--i:5">pasted</span> <span class="w" style="--i:6">into</span> <span class="w" style="--i:7">Notes.</span></span></p>
+        <div class="stage" role="img" aria-label="Five scenes cycle between an Android phone and a MacBook: a link from a chat pasted into Notes, an address copied on the Mac pasted into a ride app, an authenticator code typed into a sign-in page, a kitten picked from the phone's gallery and pasted into a team chat, and an SMS code pasted into a bank sign-in">
+          <div class="scene" aria-hidden="true">
+<svg class="defs" aria-hidden="true" width="0" height="0">
+              <defs>
+                <linearGradient id="g-kbg" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#fdeedb"/><stop offset="1" stop-color="#f6c9a4"/></linearGradient>
+                <linearGradient id="g-sun" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb38a"/><stop offset="0.55" stop-color="#ff6f91"/><stop offset="1" stop-color="#6c5ce7"/></linearGradient>
+                <linearGradient id="g-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9fd2ff"/><stop offset="1" stop-color="#eaf6ff"/></linearGradient>
+                <!-- An abstract kitten: one warm capsule with two ears, dot eyes, a blush and a tail. It blinks
+                     and sways its tail (SMIL, paused for reduced motion by the scene script). -->
+                <symbol id="g-kitty-fg" viewBox="0 0 60 60">
+                  <ellipse cx="30" cy="56.4" rx="12" ry="1.6" fill="#d48a5c" opacity="0.25"/>
+                  <path d="M41 53.4c6.6 0 9-5 6.8-10" fill="none" stroke="#f29a45" stroke-width="3.8" stroke-linecap="round">
+                    <animateTransform attributeName="transform" type="rotate" values="0 41 53;10 41 53;0 41 53" keyTimes="0;0.5;1" calcMode="spline" keySplines="0.45 0 0.55 1;0.45 0 0.55 1" dur="3s" repeatCount="indefinite"/>
+                  </path>
+                  <path d="M18.6 28 19.6 14 27.8 21.4Z M41.4 28 40.4 14 32.2 21.4Z" fill="#f5a352" stroke="#f5a352" stroke-width="2.6" stroke-linejoin="round"/>
+                  <rect x="16.5" y="19" width="27" height="37" rx="13.5" fill="#f5a352"/>
+                  <ellipse cx="25.2" cy="31" rx="1.75" ry="1.75" fill="#2b1a10">
+                    <animate attributeName="ry" values="1.75;1.75;0.25;1.75;1.75" keyTimes="0;0.9;0.94;0.98;1" dur="4.2s" repeatCount="indefinite"/>
+                  </ellipse>
+                  <ellipse cx="34.8" cy="31" rx="1.75" ry="1.75" fill="#2b1a10">
+                    <animate attributeName="ry" values="1.75;1.75;0.25;1.75;1.75" keyTimes="0;0.9;0.94;0.98;1" dur="4.2s" repeatCount="indefinite"/>
+                  </ellipse>
+                  <circle cx="21.6" cy="35" r="2" fill="#ff8fa3" opacity="0.55"/><circle cx="38.4" cy="35" r="2" fill="#ff8fa3" opacity="0.55"/>
+                  <path d="M29.1 33.6h1.8l-.9 1Z" fill="#e8707f" stroke="#e8707f" stroke-width="0.5" stroke-linejoin="round"/>
+                </symbol>
+                <symbol id="g-kitty" viewBox="0 0 60 60">
+                  <rect width="60" height="60" fill="url(#g-kbg)"/>
+                  <use href="#g-kitty-fg"/>
+                </symbol>
+                <symbol id="g-capy" viewBox="0 0 60 60">
+                  <rect width="60" height="60" fill="#d9eedb"/>
+                  <path d="M0 52Q15 46 30 52T60 52V60H0Z" fill="#9fd0a8"/>
+                  <ellipse cx="33" cy="44" rx="19" ry="11" fill="#9b6b45"/>
+                  <rect x="15" y="21" width="23" height="22" rx="10" fill="#a87650"/>
+                  <circle cx="18.5" cy="22" r="2.6" fill="#835636"/><circle cx="34.5" cy="22" r="2.6" fill="#835636"/>
+                  <path d="M19.5 29.5h3.6M29.5 29.5h3.6" stroke="#3a2616" stroke-width="1.3" stroke-linecap="round"/>
+                  <rect x="21.5" y="34" width="10" height="5.5" rx="2.7" fill="#7b4e2f"/>
+                  <circle cx="26.5" cy="14.5" r="4.6" fill="#ff9a2e"/><path d="M26.5 10q2.8-3 5 0" fill="#3fa34d"/>
+                </symbol>
+                <symbol id="g-shiba" viewBox="0 0 60 60">
+                  <rect width="60" height="60" fill="#dcebff"/>
+                  <path d="M14 28 17 10 27 20Z M46 28 43 10 33 20Z" fill="#e9a05a"/>
+                  <path d="M17.5 24 19 14.5 24.5 20Z M42.5 24 41 14.5 35.5 20Z" fill="#f7d6b4"/>
+                  <ellipse cx="30" cy="34" rx="16.5" ry="14.5" fill="#e9a05a"/>
+                  <ellipse cx="22" cy="38" rx="6" ry="5" fill="#fcefdf"/><ellipse cx="38" cy="38" rx="6" ry="5" fill="#fcefdf"/>
+                  <ellipse cx="30" cy="41" rx="8" ry="6.5" fill="#fcefdf"/>
+                  <circle cx="23" cy="27.5" r="1.6" fill="#fcefdf"/><circle cx="37" cy="27.5" r="1.6" fill="#fcefdf"/>
+                  <ellipse cx="25.5" cy="31.5" rx="2.4" ry="1.8" fill="#2b1d12"/><ellipse cx="37.5" cy="31.5" rx="2.4" ry="1.8" fill="#2b1d12"/>
+                  <ellipse cx="30" cy="37.5" rx="2.3" ry="1.6" fill="#2b1d12"/>
+                  <path d="M30 39.1q-1.8 2.4-3.8 1.2M30 39.1q1.8 2.4 3.8 1.2" fill="none" stroke="#2b1d12" stroke-width="0.8" stroke-linecap="round"/>
+                </symbol>
+                <symbol id="g-duck" viewBox="0 0 60 60">
+                  <rect width="60" height="60" fill="#d8f0ff"/>
+                  <ellipse cx="32" cy="40" rx="15" ry="10" fill="#ffd23f"/>
+                  <circle cx="24" cy="27" r="8.5" fill="#ffd23f"/>
+                  <path d="M16.5 26 8.5 28.5 16.5 31Z" fill="#ff8a00"/>
+                  <circle cx="22.2" cy="25" r="1.6" fill="#2b1d12"/>
+                  <ellipse cx="36" cy="39" rx="7.5" ry="4.6" fill="#f2bf18"/>
+                  <rect y="45" width="60" height="15" fill="#8fcdf1" opacity="0.85"/>
+                  <path d="M8 50h10M28 53h12M44 49h9" stroke="#fff" stroke-width="1.2" stroke-linecap="round" opacity="0.8"/>
+                </symbol>
+                <symbol id="g-raccoon" viewBox="0 0 60 60">
+                  <rect width="60" height="60" fill="#ebe6f8"/>
+                  <circle cx="17.5" cy="21" r="5.5" fill="#9797a3"/><circle cx="42.5" cy="21" r="5.5" fill="#9797a3"/>
+                  <circle cx="17.5" cy="21" r="2.6" fill="#5b5b66"/><circle cx="42.5" cy="21" r="2.6" fill="#5b5b66"/>
+                  <ellipse cx="30" cy="34" rx="17" ry="14" fill="#a3a3ae"/>
+                  <path d="M13 32q8-8 17-1.5 9-6.5 17 1.5-8 7.5-17 2.3Q21 39.5 13 32Z" fill="#3c3c46"/>
+                  <circle cx="23.5" cy="31.5" r="2.5" fill="#fff"/><circle cx="36.5" cy="31.5" r="2.5" fill="#fff"/>
+                  <circle cx="24" cy="31.8" r="1.3" fill="#111"/><circle cx="37" cy="31.8" r="1.3" fill="#111"/>
+                  <ellipse cx="30" cy="41" rx="6.5" ry="5" fill="#ececf2"/>
+                  <ellipse cx="30" cy="38.6" rx="1.9" ry="1.4" fill="#222"/>
+                </symbol>
+                <symbol id="g-sunset" viewBox="0 0 60 60">
+                  <rect width="60" height="60" fill="url(#g-sun)"/>
+                  <circle cx="30" cy="33" r="9" fill="#ffe3a3"/>
+                  <rect y="38" width="60" height="22" fill="#4b3f9e" opacity="0.9"/>
+                  <path d="M22 43h16M25 47h10M27 51h6" stroke="#ffd49a" stroke-width="1.3" stroke-linecap="round" opacity="0.8"/>
+                </symbol>
+                <symbol id="g-peaks" viewBox="0 0 60 60">
+                  <rect width="60" height="60" fill="url(#g-sky)"/>
+                  <path d="M0 50 17 25 28 39 41 20 60 46V60H0Z" fill="#5876cf"/>
+                  <path d="M17 25 21 31 18 30 14.5 33ZM41 20 46 27.5 42 26.5 37.5 29Z" fill="#fff"/>
+                  <path d="M0 55Q20 47 40 54T60 52V60H0Z" fill="#3d5bb0"/>
+                </symbol>
+                <symbol id="g-chart" viewBox="0 0 60 60">
+                  <rect width="60" height="60" fill="#4a40c4"/>
+                  <rect x="9" y="9" width="24" height="3.4" rx="1.7" fill="#fff" opacity="0.85"/>
+                  <rect x="10" y="34" width="6" height="16" rx="1" fill="#fff" opacity="0.85"/><rect x="20" y="26" width="6" height="24" rx="1" fill="#fff" opacity="0.85"/>
+                  <rect x="30" y="31" width="6" height="19" rx="1" fill="#fff" opacity="0.85"/><rect x="40" y="20" width="6" height="30" rx="1" fill="#fff" opacity="0.85"/>
+                </symbol>
+              </defs>
+            </svg>
+            <div class="laptop">
+            <div class="lid">
+              <div class="desk">
+                <i class="notch"></i>
+                <div class="mbar">
+                  <span class="apple" aria-hidden="true">&#xF8FF;</span>
+                  <b>Notes</b>
+                  <span>File</span>
+                  <span>Edit</span>
+                  <span>Format</span>
+                  <span>View</span>
+                  <span class="tray">
+                    <svg class="sy" viewBox="0 0 14 18" aria-hidden="true"><path d="M66 22H50A14 14 0 0 0 50 50A14 14 0 0 1 50 78H34" fill="none" stroke-width="15" transform="translate(7 9) scale(0.215) translate(-50 -50)"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M2.5 9a14 14 0 0 1 19 0M5.5 12.5a9.5 9.5 0 0 1 13 0M8.6 16a5 5 0 0 1 6.8 0"/><circle cx="12" cy="19.2" r="0.9" fill="currentColor"/></svg>
+                    <i class="bat"></i>
+                    <span>Fri Nov 13 7:24 PM</span>
+                  </span>
+                </div>
+                <div class="win w-notes on" data-app="notes">
+                  <div class="win-head">
+                    <div class="lights"><i></i><i></i><i></i></div>
+                    <div class="tools">
+                      <svg viewBox="0 0 24 24"><path d="M4 19 9.5 5h1L16 19M6.2 14h7.6"/><path d="M17 12.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5Zm2.5 0V19"/></svg>
+                      <svg viewBox="0 0 24 24"><circle cx="5.5" cy="7" r="2"/><circle cx="5.5" cy="17" r="2"/><path d="M10 7h10M10 17h10"/></svg>
+                      <svg viewBox="0 0 24 24"><path d="M12 15V3M8 7l4-4 4 4"/><path d="M5 11v8.5h14V11"/></svg>
+                    </div>
+                  </div>
+                  <div class="notes-body">
+                    <span class="when">November 13, 2026 at 7:20 PM</span>
+                    <span class="t">Friday dinner</span>
+                    <span class="row">Pokrovka 17, upstairs</span>
+                    <span class="row">Booking: <span class="val" data-fill="link">table.io/r/8KX2-Q4</span><span class="caret" data-dst="link"></span></span>
+                    <span class="row">Flowers, order 4471-0932</span>
+                  </div>
+                </div>
+                <div class="win w-web" data-app="place">
+                  <div class="wbar"><div class="lights"><i></i><i></i><i></i></div><span class="url">cafe-pokrovka.example</span></div>
+                  <div class="wbody">
+                    <span class="muted">Restaurant · Coffee · $$</span>
+                    <h6>Café Pokrovka</h6>
+                    <span class="muted">★ 4.8 · 1,204 reviews · Open until 23:00</span>
+                    <span class="lbl">Address</span>
+                    <span><span class="msel" data-src="addr">Pokrovka St 17, Moscow</span></span>
+                    <span class="lbl">Phone</span>
+                    <span>+7 495 000-00-00</span>
+                  </div>
+                </div>
+                <div class="win w-web" data-app="twofa">
+                  <div class="wbar"><div class="lights"><i></i><i></i><i></i></div><span class="url">id.example.com</span></div>
+                  <div class="wbody center">
+                    <i class="logo"></i>
+                    <h6>Two-step verification</h6>
+                    <span class="muted">Enter the 6-digit code from your authenticator app.</span>
+                    <span class="otp" data-dst="totp"><i><span class="val" data-fill="totp">4</span></i><i><span class="val" data-fill="totp">8</span></i><i><span class="val" data-fill="totp">2</span></i><i><span class="val" data-fill="totp">9</span></i><i><span class="val" data-fill="totp">1</span></i><i><span class="val" data-fill="totp">3</span></i></span>
+                    <span class="okline ok" data-fill="totp">✓ Signed in</span>
+                  </div>
+                </div>
+                <div class="win w-chat" data-app="chat">
+                  <div class="wbar"><div class="lights"><i></i><i></i><i></i></div><span class="url"># design</span></div>
+                  <div class="wbody">
+                    <div class="chat-side"><b>Studio</b><span># general</span><span class="cur"># design</span><span># release</span><span>Anna</span><span>Mark</span></div>
+                    <div class="chat-main">
+                      <div class="msg"><b>Anna</b>Standup in 5. Everyone alive?</div>
+                      <div class="msg"><b>Mark</b>Barely. Someone post the cat</div>
+                      <div class="composer" data-dst="shot"><span class="ph" data-fill="shot">Message #design</span><span class="thumb val" data-fill="shot"><svg viewBox="0 0 60 60"><use href="#g-kitty"/></svg></span></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="win w-web" data-app="bank">
+                  <div class="wbar"><div class="lights"><i></i><i></i><i></i></div><span class="url">online.bank.example</span></div>
+                  <div class="wbody">
+                    <i class="logo sq"></i>
+                    <h6>Confirm sign-in</h6>
+                    <span class="muted">We sent a code to your phone by SMS.</span>
+                    <span class="wfield" data-dst="sms"><span class="ph" data-fill="sms">Code from SMS</span><span class="val" data-fill="sms">739204</span></span>
+                    <span class="okline ok" data-fill="sms">✓ Welcome back</span>
+                  </div>
+                </div>
+                <div class="dock">
+                  <i data-dock="web" style="--c: linear-gradient(160deg, #6fc3ff, #1f6bff)"></i>
+                  <i data-dock="chat" style="--c: linear-gradient(160deg, #b9a2ff, #6a4cf0)"></i>
+                  <i style="--c: linear-gradient(160deg, #6ee39a, #12b04c)"></i>
+                  <i class="run" data-dock="notes" style="--c: linear-gradient(160deg, #ffe680, #f6b800)"></i>
+                  <i style="--c: linear-gradient(160deg, #b7bbc7, #737887)"></i>
+                  <span class="sep"></span>
+                  <i style="--c: linear-gradient(160deg, #e9ebf1, #b8bcc8)"></i>
+                </div>
+              </div>
+            </div>
+            <div class="base"></div>
+            <i class="floor"></i>
+            </div>
+
+            <div class="phone">
+              <i class="floor"></i>
+              <div class="phone-screen">
+                <div class="p-status"><span>19:24</span><i class="cam"></i><i class="bat"></i></div>
+                <div class="apps">
+                  <div class="app on" data-app="msg">
+                    <div class="p-head"><span class="ava">L</span><span class="who"><span>Lena</span><small>online</small></span></div>
+                    <div class="p-chat">
+                      <div class="b them">Still on for Friday?</div>
+                      <div class="b me">Yes! Where to?</div>
+                      <div class="b them">Pokrovka 17, the café upstairs</div>
+                      <div class="b them">Booking’s here:<br><span class="pick on" data-src="link">table.io/r/8KX2-Q4</span></div>
+                    </div>
+                    <div class="p-input"><span class="field">Message</span><span class="send"></span></div>
+                  </div>
+                  <div class="app" data-app="taxi">
+                    <div class="map"><i class="me"></i><i class="dest ok" data-fill="addr"></i></div>
+                    <div class="sheet">
+                      <b class="sheet-h">Where to?</b>
+                      <span class="field" data-dst="addr"><span class="ph" data-fill="addr">Search destination</span><span class="val" data-fill="addr">Pokrovka St 17, Moscow</span></span>
+                      <span class="okchip ok" data-fill="addr">Route ready · 14 min · 8.2 km</span>
+                      <span class="recent">⌂&nbsp; Home · Lesnaya St 5</span>
+                      <span class="recent">▣&nbsp; Work · Tverskaya St 12</span>
+                    </div>
+                  </div>
+                  <div class="app" data-app="auth">
+                    <b class="a-head">Authenticator</b>
+                    <div class="acct"><span><small>id.example.com</small><span class="code tap" data-src="totp">482 913</span></span><i class="ring"></i></div>
+                    <div class="acct"><span><small>Cloud storage</small><span class="code">903 118</span></span><i class="ring"></i></div>
+                    <div class="acct"><span><small>Work email</small><span class="code">250 671</span></span><i class="ring"></i></div>
+                    <div class="acct"><span><small>Domain registrar</small><span class="code">618 044</span></span><i class="ring"></i></div>
+                  </div>
+                  <div class="app app-photo" data-app="photo">
+                    <div class="gal">
+                      <div class="gal-head"><b>Photos</b><span>Today</span></div>
+                      <div class="gal-grid"><i class="tile"><svg viewBox="0 0 60 60"><use href="#g-capy"/></svg></i><i class="tile"><svg viewBox="0 0 60 60"><use href="#g-sunset"/></svg></i><i class="tile"><svg viewBox="0 0 60 60"><use href="#g-shiba"/></svg></i><i class="tile"><svg viewBox="0 0 60 60"><use href="#g-peaks"/></svg></i><i class="tile" data-tile="shot"><svg viewBox="0 0 60 60"><use href="#g-kitty"/></svg></i><i class="tile"><svg viewBox="0 0 60 60"><use href="#g-duck"/></svg></i><i class="tile"><svg viewBox="0 0 60 60"><use href="#g-raccoon"/></svg></i><i class="tile"><svg viewBox="0 0 60 60"><use href="#g-chart"/></svg></i><i class="tile"><svg viewBox="0 0 60 60"><use href="#g-sunset"/></svg></i></div>
+                      <div class="gal-head sub"><span>Yesterday</span></div>
+                      <div class="gal-grid"><i class="tile"><svg viewBox="0 0 60 60"><use href="#g-peaks"/></svg></i><i class="tile"><svg viewBox="0 0 60 60"><use href="#g-duck"/></svg></i><i class="tile"><svg viewBox="0 0 60 60"><use href="#g-capy"/></svg></i><i class="tile"><svg viewBox="0 0 60 60"><use href="#g-chart"/></svg></i><i class="tile"><svg viewBox="0 0 60 60"><use href="#g-shiba"/></svg></i><i class="tile"><svg viewBox="0 0 60 60"><use href="#g-raccoon"/></svg></i></div>
+                    </div>
+                    <div class="viewer">
+                      <div class="shot" data-src="shot"><svg viewBox="0 0 60 60"><use href="#g-kitty-fg"/></svg></div>
+                    </div>
+                  </div>
+                  <div class="app" data-app="sms">
+                    <div class="p-head"><span class="ava">B</span><span class="who"><span>Bank</span><small>SMS</small></span></div>
+                    <div class="p-chat">
+                      <div class="b them"><span class="pick" data-src="sms">739204</span> is your sign-in code. Don’t share it with anyone.</div>
+                    </div>
+                    <div class="p-input"><span class="field">Text message</span><span class="send"></span></div>
+                  </div>
+                </div>
+                <div class="p-tools"><span class="copy">Copy</span><span>Share</span><span class="more">⋮</span></div>
+                <span class="p-paste">Paste</span>
+                <span class="p-toast">Copied to clipboard</span>
+                <i class="gesture"></i>
+              </div>
+            </div>
+
+            <canvas class="stream"></canvas>
+            <span class="ripple"></span>
+            <span class="key">⌘V</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <section class="both">
+    <div class="wrap">
+      <p class="eyebrow">Both ways</p>
+      <h2>Works both ways, in the apps you already use</h2>
+      <p class="prose">Copy on the phone, paste on the Mac, or the reverse. No more sending links to yourself.</p>
+      <ul class="routes">
+        <li class="route-row"><span class="path"><span class="dev"><span class="tile"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="4.5" y="1.5" width="7" height="13" rx="1.8"/><path d="M7 12.2h2"/></svg></span>Android</span><span class="to" aria-hidden="true"><svg viewBox="0 0 32 12"><path d="M1 6H29M24 1.5L29.5 6L24 10.5"/></svg></span><span class="sr-only"> to </span><span class="dev"><span class="tile"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="3" width="11" height="7.5" rx="1"/><path d="M1 13h14"/></svg></span>Mac</span></span><span><span class="what">A link from a chat</span><span class="how">Select it, tap Copy, then <kbd>⌘V</kbd> on the Mac.</span></span></li>
+        <li class="route-row"><span class="path"><span class="dev"><span class="tile"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="3" width="11" height="7.5" rx="1"/><path d="M1 13h14"/></svg></span>Mac</span><span class="to" aria-hidden="true"><svg viewBox="0 0 32 12"><path d="M1 6H29M24 1.5L29.5 6L24 10.5"/></svg></span><span class="sr-only"> to </span><span class="dev"><span class="tile"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="4.5" y="1.5" width="7" height="13" rx="1.8"/><path d="M7 12.2h2"/></svg></span>Android</span></span><span><span class="what">An address from a website</span><span class="how"><kbd>⌘C</kbd> on the Mac, then Paste in the ride or maps app.</span></span></li>
+        <li class="route-row"><span class="path"><span class="dev"><span class="tile"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="4.5" y="1.5" width="7" height="13" rx="1.8"/><path d="M7 12.2h2"/></svg></span>Android</span><span class="to" aria-hidden="true"><svg viewBox="0 0 32 12"><path d="M1 6H29M24 1.5L29.5 6L24 10.5"/></svg></span><span class="sr-only"> to </span><span class="dev"><span class="tile"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="3" width="11" height="7.5" rx="1"/><path d="M1 13h14"/></svg></span>Mac</span></span><span><span class="what">A photo or a screenshot</span><span class="how">Copy it in Gallery or Share → Syncliko, then paste into Slack, Figma or Mail. Up to 20 MB.</span></span></li>
+        <li class="route-row"><span class="path"><span class="dev"><span class="tile"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="4.5" y="1.5" width="7" height="13" rx="1.8"/><path d="M7 12.2h2"/></svg></span>iPhone</span><span class="to" aria-hidden="true"><svg viewBox="0 0 32 12"><path d="M1 6H29M24 1.5L29.5 6L24 10.5"/></svg></span><span class="sr-only"> to </span><span class="dev"><span class="tile"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="3" width="11" height="7.5" rx="1"/><path d="M1 13h14"/></svg></span>Mac</span><span class="to" aria-hidden="true"><svg viewBox="0 0 32 12"><path d="M1 6H29M24 1.5L29.5 6L24 10.5"/></svg></span><span class="sr-only"> to </span><span class="dev"><span class="tile"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="4.5" y="1.5" width="7" height="13" rx="1.8"/><path d="M7 12.2h2"/></svg></span>Android</span></span><span><span class="what">Text from a work iPhone</span><span class="how">Universal Clipboard puts it on the Mac, and Syncliko passes it on to the phone.</span></span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="modes">
+    <div class="wrap">
+      <p class="eyebrow">Android → Mac</p>
+      <h2>Three ways to send from your phone</h2>
+      <p class="prose">Android lets only the app on screen read the clipboard, so Syncliko needs a sign that you copied something. Choose how it gets that sign. Copies from the Mac reach the phone in every mode, with no setup.</p>
+      <div class="ways">
+        <div class="ways-labels" aria-hidden="true"><span></span><span>Sends</span><span>Works in</span><span>Setup</span><span>After a restart</span><span>Notification</span></div>
+        <article class="way">
+          <div class="way-head"><span class="tag">No setup</span><h3>Manual</h3><p>You send a copy yourself, with one tap.</p></div>
+          <dl>
+            <div><dt>Sends</dt><dd><strong>When you tap</strong>“Send to Mac” in the selection menu, Share → Syncliko or the Quick Settings tile</dd></div>
+            <div><dt>Works in</dt><dd><strong>Any app</strong>Whatever you choose to send</dd></div>
+            <div><dt>Setup</dt><dd><strong>None</strong>Pair with the Mac and you’re done</dd></div>
+            <div><dt>After a restart</dt><dd><strong>Nothing to do</strong></dd></div>
+            <div><dt>Notification</dt><dd><strong>A quiet status notification</strong>You can hide it in Settings</dd></div>
+          </dl>
+        </article>
+        <article class="way featured">
+          <div class="way-head"><span class="tag">Recommended</span><h3>Standard</h3><p>Copy as usual and it’s on the Mac.</p></div>
+          <dl>
+            <div><dt>Sends</dt><dd><strong>Automatically</strong>An accessibility service notices a tap on Copy, a “Copied” message or the selection menu closing. It never reads your screen.</dd></div>
+            <div><dt>Works in</dt><dd><strong>Most apps</strong>Chrome, messengers, Notes, Gallery and others</dd></div>
+            <div><dt>Setup</dt><dd><strong>One switch</strong>Turn it on in Accessibility settings. On Samsung, allow restricted settings first.</dd></div>
+            <div><dt>After a restart</dt><dd><strong>Nothing to do</strong></dd></div>
+            <div><dt>Notification</dt><dd><strong>None</strong>Nothing stays in the status bar</dd></div>
+          </dl>
+        </article>
+        <article class="way">
+          <div class="way-head"><span class="tag">Computer once</span><h3>Pro · ADB</h3><p>Catches every copy Android records.</p></div>
+          <dl>
+            <div><dt>Sends</dt><dd><strong>Automatically</strong>Android logs every copy in its system log, and Syncliko follows it</dd></div>
+            <div><dt>Works in</dt><dd><strong>Every app</strong>Including ones Standard misses</dd></div>
+            <div><dt>Setup</dt><dd><strong>Two commands</strong>Run once from a computer over USB or wireless debugging</dd></div>
+            <div><dt>After a restart</dt><dd><strong>One tap</strong>Open Syncliko and allow log access when Android asks</dd></div>
+            <div><dt>Notification</dt><dd><strong>A quiet status notification</strong>You can hide it in Settings</dd></div>
+          </dl>
+        </article>
+      </div>
+      <div class="ways-foot">
+        <div>
+          <p><b>Standard and Pro can be on together.</b> Pro catches every copy, and Standard keeps working after a restart until you allow log access.</p>
+          <p><b>Pro setup, once.</b> Needs <code>adb</code> from Android platform-tools.</p>
+        </div>
+        <div class="cmd">
+          <pre id="adb-cmd">adb shell pm grant com.syncliko.android android.permission.READ_LOGS
+adb shell appops set com.syncliko.android SYSTEM_ALERT_WINDOW allow</pre>
+          <button class="copy-btn" type="button" id="copy-adb" data-copy="adb-cmd">Copy</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq" class="faq">
+    <div class="wrap">
+      <p class="eyebrow">FAQ</p>
+      <h2>Questions people ask first</h2>
+      <div class="qa">
+        <details><summary>Does it work with an iPhone or Windows?</summary><p>No. Syncliko connects an Android phone to a Mac. An iPhone and a Mac already share a clipboard through Apple’s Universal Clipboard, and Syncliko passes those copies on to your Android phone.</p></details>
+        <details><summary>Why isn’t it on Google Play or the App Store?</summary><p>Automatic sending relies on an accessibility service and, optionally, log access granted over ADB. Store rules don’t allow that for a clipboard app, so you install Syncliko directly: an APK on the phone and an app you drag to Applications on the Mac.</p></details>
+        <details><summary>Why does Android say “pasted from your clipboard”?</summary><p>Android 12 and later show that message whenever an app reads the clipboard. Apps can’t hide it. You’ll see it each time Syncliko picks up something you copied.</p></details>
+        <details><summary>Do both devices need to be on the same network?</summary><p>On the same Wi-Fi they find each other automatically. Guest networks that keep devices apart won’t work. Away from home, install Tailscale on both and Syncliko connects through it.</p></details>
+        <details><summary>Will it drain the battery?</summary><p>No. While the screen is off there’s no connection at all. On a Galaxy Z Fold 8 it used under 0.1 mAh over four hours of standby.</p></details>
+        <details><summary>What happens to passwords and 2FA codes?</summary><p>They sync like anything else, so a code from your authenticator or an SMS lands on the Mac the moment you copy it. Copies a password manager marks as secret keep that mark on the other device. Like every clip, they travel only between your own paired devices, encrypted.</p></details>
+        <details><summary>How do I remove it?</summary><p>Uninstall the app on each device; its pairing data goes with it. On the Mac you can also delete the “com.syncliko.identity” item in Keychain Access.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section id="install" class="install">
+    <div class="wrap">
+      <p class="eyebrow">Install</p>
+      <h2>Install on both, pair with a QR code</h2>
+      <div class="grid">
+        <div class="platform">
+          <h3>Mac</h3>
+          <ol>
+            <li>Open the disk image and drag Syncliko to Applications.</li>
+            <li>Open it. macOS blocks the first launch because the app isn’t notarized: go to System Settings → Privacy &amp; Security and click Open Anyway.</li>
+            <li>Click the Syncliko icon in the menu bar, then Pair a Device to show a QR code.</li>
+            <li>In Privacy &amp; Security → Paste from Other Apps, set Syncliko to Always Allow.</li>
+          </ol>
+          <span class="req">macOS 26+ · Apple silicon · v0.3.2 · 3.1 MB</span>
+          <a class="btn primary" href="https://github.com/kdanet/syncliko/releases/latest/download/Syncliko.dmg">Download for Mac</a>
+        </div>
+        <div class="platform">
+          <h3>Android</h3>
+          <ol>
+            <li>Download the APK and open it. Allow installs from your browser when Android asks.</li>
+            <li>Scan the QR code on your Mac and check that both screens show the same 6-digit code.</li>
+            <li>Allow local network access, notifications and unrestricted battery use.</li>
+            <li>Turn on Standard in Accessibility settings. If it’s greyed out, open App info → ⋮ → Allow restricted settings first. Or set up Pro over ADB.</li>
+          </ol>
+          <span class="req">Android 12+ · One UI, HyperOS, ColorOS, OxygenOS, Pixel · v0.3.2 · 4.0 MB</span>
+          <div class="btn-row">
+            <a class="btn primary" href="https://github.com/kdanet/syncliko/releases/latest/download/Syncliko.apk">Download APK</a>
+            <a class="btn" href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://add/https://github.com/kdanet/syncliko" rel="noopener">Add to Obtainium</a>
+          </div>
+          <p class="note">Obtainium installs new versions from GitHub Releases as they come out.</p>
+        </div>
+      </div>
+      <p class="fine">The Mac app is signed with a personal developer certificate and isn’t notarized by Apple. Both apps are free, and the source and every release are on <a href="https://github.com/kdanet/syncliko" rel="noopener">GitHub</a>.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span class="foot-brand"><svg class="brand-mark" viewBox="0 0 100 100" aria-hidden="true"><rect class="mark-tile" width="100" height="100" rx="22"/><g transform="translate(50 50) scale(0.8) translate(-50 -50)" fill="none" stroke-width="13"><path class="mark-a" d="M66 22H50A14 14 0 0 0 50 50"/><path class="mark-b" d="M50 50A14 14 0 0 1 50 78H34"/></g></svg>Syncliko<span class="foot-ver">0.3.2</span></span>
+    <span>No analytics, no cookies, no servers. Your clipboard stays between your devices.</span>
+    <span class="foot-links"><a class="foot-link" href="how-it-works.html">How it works</a><a class="foot-link" href="https://github.com/kdanet/syncliko" rel="noopener">GitHub</a></span>
+  </div>
+</footer>
+
+<script>
+/* The menu bar's Apple logo is a glyph only Apple's fonts have. */
+if (!/Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)) {
+  document.querySelectorAll('.mbar .apple').forEach(function (el) { el.remove(); });
+}
+/* Headline: fit the "Copy" selection to the letters, then mirror the two lines every few seconds. */
+(function () {
+  var flip = document.querySelector('.flip');
+  if (!flip) return;
+  var h1 = flip.parentNode, sel = flip.querySelector('.sel');
+  var slots = flip.querySelectorAll('.slot'), tails = flip.querySelectorAll('.tail');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var HEX = '0123456789ABCDEF';
+  var fs = function () { return parseFloat(getComputedStyle(h1).fontSize); };
+  var em = function (v) { return v.toFixed(3) + 'em'; };
+
+  // Highlight from the top of the C to the bottom of the y with an even margin, measured in the font
+  // the system actually picked. The word's box puts its baseline at (line-height + ascent - descent) / 2.
+  function fitSelection() {
+    var cs = getComputedStyle(h1), f = parseFloat(cs.fontSize);
+    var c = document.createElement('canvas').getContext('2d');
+    if (!c) return;
+    c.font = cs.fontWeight + ' ' + f + 'px ' + cs.fontFamily;
+    var w = c.measureText('Copy'), first = c.measureText('C'), last = c.measureText('y');
+    if (!w.fontBoundingBoxAscent || !w.actualBoundingBoxAscent) return;
+    var lh = parseFloat(cs.lineHeight) / f, ls = (parseFloat(cs.letterSpacing) || 0) / f;
+    var base = (lh + (w.fontBoundingBoxAscent - w.fontBoundingBoxDescent) / f) / 2;
+    var padV = 0.09, padH = 0.08;
+    sel.style.setProperty('--hl-t', em(base - w.actualBoundingBoxAscent / f - padV));
+    sel.style.setProperty('--hl-b', em(lh - base - w.actualBoundingBoxDescent / f - padV));
+    sel.style.setProperty('--hl-l', em(-first.actualBoundingBoxLeft / f - padH));
+    sel.style.setProperty('--hl-r', em(-((last.actualBoundingBoxRight - last.width) / f - ls + padH)));
+  }
+
+  var probe = document.createElement('span');
+  probe.style.cssText = 'position:absolute;left:0;top:0;visibility:hidden;white-space:nowrap';
+  slots[0].parentNode.appendChild(probe);
+  var wordWidth = function (t) { probe.textContent = t; return probe.getBoundingClientRect().width / fs(); };
+  var parts = Array.prototype.map.call(tails, function (tail) {
+    var stop = tail.querySelector('.stop'), kbd = tail.querySelector('.kbd'), f = fs();
+    return {
+      stop: stop.getBoundingClientRect().width / f,
+      kbd: (kbd.getBoundingClientRect().width + parseFloat(getComputedStyle(kbd).marginLeft)) / f
+    };
+  });
+
+  function layout(dir) {
+    Array.prototype.forEach.call(slots, function (s) { s.style.width = em(wordWidth(s.getAttribute('data-' + dir))); });
+    Array.prototype.forEach.call(tails, function (tail, i) {
+      var k = tail.classList.contains('k');
+      tail.style.width = em(k ? parts[i].kbd : parts[i].stop);
+      tail.firstChild.style.transform = k ? 'translateX(' + em(-parts[i].stop) + ')' : '';
+    });
+  }
+
+  // The new word decodes out of hex bytes left to right, while the slot eases to its new width.
+  function decode(slot, to) {
+    var from = slot.textContent, frame = 0;
+    var at = to.split('').map(function (_, j) { return 5 + j * 1.5 + Math.random() * 2.5; });
+    var end = Math.max.apply(null, at);
+    (function tick() {
+      frame++;
+      var len = Math.round(from.length + (to.length - from.length) * Math.min(1, frame / 8));
+      var html = '';
+      for (var j = 0; j < len; j++) {
+        html += j < to.length && frame >= at[j] ? to[j] : '<span class="nz">' + HEX[Math.random() * 16 | 0] + '</span>';
+      }
+      if (frame >= end) { slot.textContent = to; return; }
+      slot.innerHTML = html;
+      setTimeout(tick, 38);
+    })();
+  }
+
+  var dir = 'am';
+  function swap() {
+    dir = dir === 'am' ? 'ma' : 'am';
+    flip.setAttribute('data-dir', dir);
+    Array.prototype.forEach.call(tails, function (t) { t.classList.toggle('k'); });
+    layout(dir);
+    Array.prototype.forEach.call(slots, function (s, i) {
+      setTimeout(function () { decode(s, s.getAttribute('data-' + dir)); }, i * 140);
+    });
+  }
+
+  fitSelection();
+  layout(dir);
+  flip.classList.add('ready');
+  void flip.offsetWidth;
+  flip.classList.add('anim');
+
+  var visible = true;
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (es) { visible = es[0].isIntersecting; }).observe(h1);
+  }
+  setInterval(function () {
+    if (visible && !document.hidden && !reduce.matches) swap();
+  }, 4200);
+})();
+
+(function () {
+
+  // Copy buttons: keep the original label once, so a double click can't make "Copied" stick.
+  document.querySelectorAll('[data-copy]').forEach(function (btn) {
+    var label = btn.textContent, timer = null;
+    btn.setAttribute('aria-live', 'polite');
+    btn.addEventListener('click', function () {
+      var pre = document.getElementById(btn.getAttribute('data-copy'));
+      var done = function () {
+        btn.textContent = 'Copied';
+        clearTimeout(timer);
+        timer = setTimeout(function () { btn.textContent = label; }, 1400);
+      };
+      var fallback = function () {
+        var range = document.createRange(); range.selectNodeContents(pre);
+        var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(pre.textContent).then(done, fallback);
+      else fallback();
+    });
+  });
+
+  /* Hero scenes: phone → Mac, then Mac → phone. Every .stage on the page runs its own loop. Positions
+     come from the laid-out elements, so the arc always starts at the selected text and ends at the
+     caret, whatever the stage size or 3D transform. */
+  function scene(stage) {
+    var q = function (sel) { return stage.querySelector(sel); };
+    var qa = function (sel) { return stage.querySelectorAll(sel); };
+    var demo = stage.closest('.demo');
+    var sceneEl = q('.scene'), tools = q('.p-tools'), ripple = q('.ripple');
+    var sy = q('.sy'), key = q('.key'), screenEl = q('.phone-screen');
+    var pasteTip = q('.p-paste'), toastEl = q('.p-toast'), appName = q('.mbar b');
+    var caseEl = demo.querySelector('.case');
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    /* The playlist. dir: a2m = phone → Mac, m2a = Mac → phone. copy: how the copy happens on the source
+       device. */
+    var JPEG = [0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46, 0x00, 0x01, 0x01, 0x00, 0x00, 0x48, 0x00, 0x48, 0xff, 0xdb];
+    var SCENES = [
+      { id: 'link', lead: 'A link from a chat,', rest: 'pasted into Notes.', dir: 'a2m', phone: 'msg', mac: 'notes', app: 'Notes', dock: 'notes', copy: 'select', payload: 'table.io/r/8KX2-Q4' },
+      { id: 'addr', lead: 'An address on the Mac,', rest: 'pasted into a ride.', dir: 'm2a', phone: 'taxi', mac: 'place', app: 'Safari', dock: 'web', copy: 'cmdc', payload: 'Pokrovka St 17, Moscow' },
+      { id: 'totp', lead: 'An authenticator code,', rest: 'pasted into a sign-in.', dir: 'a2m', phone: 'auth', mac: 'twofa', app: 'Safari', dock: 'web', copy: 'tap', payload: '482913' },
+      { id: 'shot', lead: 'A kitten from the gallery,', rest: 'pasted into the team chat.', dir: 'a2m', phone: 'photo', mac: 'chat', app: 'Chat', dock: 'chat', copy: 'select', pre: 'gallery', payload: JPEG },
+      { id: 'sms', lead: 'A code from an SMS,', rest: 'pasted into the bank.', dir: 'a2m', phone: 'sms', mac: 'bank', app: 'Safari', dock: 'web', copy: 'select', payload: '739204' }
+    ];
+    var current = SCENES[0];
+
+    /* Element box in the scene's own coordinates; divides out any scale applied to the scene. */
+    function rel(el) {
+      var r = el.getBoundingClientRect(), s = sceneEl.getBoundingClientRect(), k = s.width / sceneEl.offsetWidth || 1;
+      return { x: (r.left - s.left) / k, y: (r.top - s.top) / k, w: r.width / k, h: r.height / k };
+    }
+    function arc(a, b) {
+      var dx = Math.abs(b.x - a.x), dy = Math.abs(b.y - a.y);
+      if (dy > dx) {
+        var side = Math.min(120, Math.max(30, dy * 0.35));
+        return { a: a, b: b, c: { x: Math.max(a.x, b.x) + side, y: (a.y + b.y) / 2 } };
+      }
+      var lift = Math.min(140, Math.max(40, dx * 0.22));
+      return { a: a, b: b, c: { x: (a.x + b.x) / 2, y: Math.min(a.y, b.y) - lift } };
+    }
+    function at(cv, t) {
+      var u = 1 - t;
+      return { x: u * u * cv.a.x + 2 * u * t * cv.c.x + t * t * cv.b.x, y: u * u * cv.a.y + 2 * u * t * cv.c.y + t * t * cv.b.y };
+    }
+
+    /* The payload as its real bytes on a canvas: characters leave the source, become hex, scramble into
+       ciphertext mid-flight (TLS), turn back into hex and land as characters at the target. Images
+       travel as the bytes of a JPEG header. */
+    var stream = q('canvas.stream'), sctx = null;
+    function sizeStream() {
+      var dpr = Math.min(2, window.devicePixelRatio || 1);
+      stream.width = Math.round(sceneEl.offsetWidth * dpr);
+      stream.height = Math.round(sceneEl.offsetHeight * dpr);
+      sctx = stream.getContext('2d');
+      sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    function glyphsOf(payload) {
+      if (typeof payload !== 'string') return payload.map(function (b) { return { ch: '▪', hex: ('0' + b.toString(16)).slice(-2) }; });
+      var enc = new TextEncoder(), out = [];
+      Array.from(payload).forEach(function (chr) {
+        enc.encode(chr).forEach(function (b, k) { out.push({ ch: k ? '·' : chr, hex: ('0' + b.toString(16)).slice(-2) }); });
+      });
+      return out;
+    }
+    function flowBytes(payload, src, cv, ms, freeze) {
+      sizeStream();
+      var glyphs = glyphsOf(payload), n = glyphs.length, parts = [];
+      var size = parseFloat(getComputedStyle(sceneEl).fontSize) * 0.78;
+      for (var k = 0; k < 3; k++) {
+        glyphs.forEach(function (g, i) {
+          parts.push({
+            ch: g.ch, hex: g.hex,
+            lag: (i / n) * 0.26 + k * 0.04 + Math.random() * 0.02,
+            amp: (Math.random() * 2 - 1) * (8 + Math.random() * 22) * (k ? 1.4 : 0.6),
+            sx: src.x + ((i + 0.5) / n) * src.w, sy: src.y + Math.min(src.h / 2, 30), ghost: k > 0
+          });
+        });
+      }
+      var hexes = '0123456789abcdef', cs = getComputedStyle(stage);
+      var plain = cs.getPropertyValue('--stream-plain').trim() || '#2f3ab8';
+      var cipherInk = cs.getPropertyValue('--stream-cipher').trim() || '#8f98ea';
+      var glow = cs.getPropertyValue('--stream-glow').trim() || 'rgba(74, 86, 209, 0.35)';
+      return new Promise(function (done) {
+        var start = null;
+        function step(now) {
+          if (start === null) start = now;
+          var t = freeze != null ? freeze : Math.min(1, (now - start) / ms);
+          sctx.clearRect(0, 0, sceneEl.offsetWidth, sceneEl.offsetHeight);
+          sctx.font = '500 ' + size + 'px ui-monospace, "SF Mono", Menlo, monospace';
+          sctx.textAlign = 'center'; sctx.textBaseline = 'middle';
+          parts.forEach(function (p) {
+            var u = (t - p.lag) / (1 - 0.36);
+            if (u <= 0 || u >= 1) return;
+            var e = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2, v = 1 - e;
+            var x = v * v * p.sx + 2 * v * e * cv.c.x + e * e * cv.b.x;
+            var y = v * v * p.sy + 2 * v * e * cv.c.y + e * e * cv.b.y;
+            var dx = 2 * v * (cv.c.x - p.sx) + 2 * e * (cv.b.x - cv.c.x), dy = 2 * v * (cv.c.y - p.sy) + 2 * e * (cv.b.y - cv.c.y);
+            var len = Math.hypot(dx, dy) || 1, off = p.amp * Math.sin(Math.PI * e);
+            x += (-dy / len) * off; y += (dx / len) * off;
+            var cipher = e > 0.3 && e < 0.7, glyph;
+            if (e < 0.1 || e > 0.92) glyph = p.ch;
+            else if (cipher) glyph = hexes[Math.random() * 16 | 0] + hexes[Math.random() * 16 | 0];
+            else glyph = p.hex;
+            sctx.globalAlpha = Math.min(1, u * 7, (1 - u) * 7) * (p.ghost ? 0.38 : 1);
+            sctx.shadowColor = glow;
+            sctx.shadowBlur = p.ghost ? 0 : (cipher ? 6 : 12);
+            sctx.fillStyle = cipher ? cipherInk : plain;
+            sctx.fillText(glyph, x, y);
+          });
+          sctx.globalAlpha = 1;
+          if (freeze != null) { done(); return; }
+          if (t < 1) requestAnimationFrame(step);
+          else { sctx.clearRect(0, 0, sceneEl.offsetWidth, sceneEl.offsetHeight); done(); }
+        }
+        requestAnimationFrame(step);
+      });
+    }
+
+    function land(cv) {
+      ripple.style.left = cv.b.x + 'px';
+      ripple.style.top = cv.b.y + 'px';
+      ripple.classList.remove('go'); void ripple.offsetWidth; ripple.classList.add('go');
+    }
+    function showKey(target, label) {
+      var r = rel(target);
+      key.textContent = label;
+      key.style.left = Math.min(r.x + r.w + 6, sceneEl.offsetWidth - key.offsetWidth - 4) + 'px';
+      key.style.top = (r.y - key.offsetHeight - 4) + 'px';
+      key.classList.add('show');
+    }
+    function above(el, overlay, gap) {
+      var r = el.getBoundingClientRect(), sc = screenEl.getBoundingClientRect(), k = sc.width / screenEl.offsetWidth || 1;
+      var left = (r.left - sc.left) / k + Math.min(r.width / k, screenEl.offsetWidth) / 2 - overlay.offsetWidth / 2;
+      overlay.style.left = Math.max(4, Math.min(left, screenEl.offsetWidth - overlay.offsetWidth - 4)) + 'px';
+      var top = (r.top - sc.top) / k;
+      // A full-screen photo is long-pressed above the subject, so the toolbar clears the kitten.
+      if (r.height / k > screenEl.offsetHeight * 0.5) top += r.height / k * 0.3;
+      overlay.style.top = Math.max(gap, top - overlay.offsetHeight - gap) + 'px';
+    }
+    function ping() { sy.classList.remove('ping'); void sy.offsetWidth; sy.classList.add('ping'); }
+    function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+    /* Resolves when the element's open/switch transition has finished (or after a safety timeout), so
+       the arc is measured on the settled layout, not on a window still growing out of the Dock. */
+    function settled(el, max) {
+      return new Promise(function (done) {
+        var t = setTimeout(done, max);
+        el.addEventListener('transitionend', function end(e) {
+          if (e.target !== el || e.propertyName !== 'transform') return;
+          el.removeEventListener('transitionend', end); clearTimeout(t); done();
+        });
+      });
+    }
+
+    /* Switch the phone app and the Mac window, as the systems themselves animate it. */
+    function show(sc, index, instant) {
+      qa('.app').forEach(function (a) {
+        var on = a.dataset.app === sc.phone;
+        if (!on && a.classList.contains('on') && !instant) {
+          a.classList.add('gone');
+          setTimeout(function () { a.classList.remove('gone'); }, 600);
+        }
+        a.classList.toggle('on', on);
+      });
+      qa('.win').forEach(function (w) { w.classList.toggle('on', w.dataset.app === sc.mac); });
+      qa('.dock i[data-dock]').forEach(function (d) {
+        var on = d.dataset.dock === sc.dock;
+        if (on) d.classList.add('run');
+        if (on && !instant) { d.classList.remove('bounce'); void d.offsetWidth; d.classList.add('bounce'); }
+      });
+      appName.textContent = sc.app;
+      caseTitle(sc, instant);
+    }
+    /* The case title, one span per word so the words can enter one after another. */
+    function caseHTML(sc) {
+      var i = 0;
+      var words = function (t) { return t.split(' ').map(function (w) { return '<span class="w" style="--i:' + (i++) + '">' + w + '</span>'; }).join(' '); };
+      return '<span class="c-lead">' + words(sc.lead) + '</span> <span class="c-rest">' + words(sc.rest) + '</span>';
+    }
+    function caseTitle(sc, instant) {
+      if (!caseEl || caseEl.getAttribute('data-id') === sc.id) return;
+      caseEl.setAttribute('data-id', sc.id);
+      if (instant || reduce.matches) { caseEl.innerHTML = caseHTML(sc); return; }
+      caseEl.classList.add('out');
+      setTimeout(function () { caseEl.innerHTML = caseHTML(sc); caseEl.classList.remove('out'); }, 340);
+    }
+    // Reserve the height of the tallest title at this width, measured on an invisible copy.
+    function fitCase() {
+      if (!caseEl) return;
+      var probe = caseEl.cloneNode(false);
+      probe.style.cssText = 'position:absolute;visibility:hidden;min-height:0;width:' + caseEl.clientWidth + 'px';
+      caseEl.parentNode.appendChild(probe);
+      var tallest = 0;
+      SCENES.forEach(function (sc) { probe.innerHTML = caseHTML(sc); tallest = Math.max(tallest, probe.getBoundingClientRect().height); });
+      probe.remove();
+      caseEl.style.minHeight = Math.ceil(tallest) + 'px';
+    }
+    function resetScene(sc) {
+      qa('[data-fill="' + sc.id + '"]').forEach(function (el) {
+        if (el.classList.contains('ph')) el.hidden = false;
+        else { el.hidden = true; el.classList.remove('fresh'); }
+      });
+      var src = q('[data-src="' + sc.id + '"]');
+      if (src) src.classList.remove('on');
+      qa('.viewer').forEach(function (v) { v.classList.remove('open'); });
+    }
+    function fill(sc) {
+      qa('[data-fill="' + sc.id + '"]').forEach(function (el) {
+        if (el.classList.contains('ph')) el.hidden = true;
+        else { el.hidden = false; if (!el.classList.contains('ok')) el.classList.add('fresh'); }
+      });
+    }
+    function unfresh(sc) { qa('[data-fill="' + sc.id + '"]').forEach(function (el) { el.classList.remove('fresh'); }); }
+    function path(sc) {
+      var s = rel(q('[data-src="' + sc.id + '"]')), d = rel(q('[data-dst="' + sc.id + '"]'));
+      var end = sc.mac === 'notes' ? { x: d.x, y: d.y + d.h / 2 } : { x: d.x + Math.min(d.w * 0.3, 40), y: d.y + d.h / 2 };
+      // Bytes leave a line of text near its top, and a full-screen photo from its subject.
+      return arc({ x: s.x + s.w / 2, y: s.y + (s.h > 160 ? s.h * 0.55 : Math.min(s.h / 2, 12)) }, end);
+    }
+
+    async function play(sc, index) {
+      current = sc;
+      resetScene(sc);
+      show(sc, index, false);
+      var settle = Promise.all([settled(q('.win[data-app="' + sc.mac + '"]'), 1400), settled(q('.app[data-app="' + sc.phone + '"]'), 1400)]);
+      await wait(1100);
+      await settle;
+      var src = q('[data-src="' + sc.id + '"]'), dst = q('[data-dst="' + sc.id + '"]');
+      // Open the photo from the gallery grid: the tile is tapped, the viewer grows out of it.
+      if (sc.pre === 'gallery') {
+        var tileEl = q('[data-tile="' + sc.id + '"]'), viewer = q('.app[data-app="' + sc.phone + '"] .viewer');
+        await wait(500); tileEl.classList.add('tap');
+        await wait(220);
+        var tr = rel(tileEl), ar = rel(viewer);
+        viewer.style.transformOrigin = ((tr.x + tr.w / 2 - ar.x) / ar.w * 100) + '% ' + ((tr.y + tr.h / 2 - ar.y) / ar.h * 100) + '%';
+        viewer.classList.add('open'); tileEl.classList.remove('tap');
+        await Promise.all([settled(viewer, 900), wait(500)]);
+        await wait(250);
+      }
+      // Copy on the source device.
+      if (sc.copy === 'cmdc') {
+        src.classList.add('on');
+        await wait(500); showKey(src, '⌘C');
+        await wait(650); key.classList.remove('show');
+      } else if (sc.copy === 'tap') {
+        src.classList.add('on'); toastEl.classList.add('show');
+        await wait(900); toastEl.classList.remove('show');
+      } else {
+        src.classList.add('on');
+        await wait(600); above(src, tools, 8); tools.classList.add('show');
+        await wait(700); tools.classList.add('pressed');
+        await wait(260); tools.classList.remove('show', 'pressed');
+      }
+      // Travel.
+      var cv = path(sc);
+      if (sc.dir === 'm2a') ping();
+      await flowBytes(sc.payload, rel(src), cv, typeof sc.payload === 'string' ? 1500 + sc.payload.length * 20 : 1900);
+      if (sc.dir === 'a2m') ping();
+      land(cv);
+      if (sc.copy !== 'cmdc') src.classList.remove('on');
+      // Paste on the target device.
+      if (sc.dir === 'a2m') {
+        await wait(380); showKey(dst, '⌘V');
+        await wait(420); key.classList.remove('show');
+      } else {
+        await wait(300); above(dst, pasteTip, 6); pasteTip.classList.add('show');
+        await wait(750); pasteTip.classList.remove('show');
+      }
+      src.classList.remove('on');
+      fill(sc);
+      await wait(1700); unfresh(sc);
+      await wait(1100);
+    }
+
+    /* Still frame for reduced motion: the first scene, halfway through its trip. */
+    function still() {
+      var sc = SCENES[0];
+      current = sc;
+      show(sc, 0, true);
+      resetScene(sc);
+      var src = q('[data-src="' + sc.id + '"]');
+      src.classList.add('on');
+      var cv = path(sc);
+      flowBytes(sc.payload, rel(src), cv, 1, 0.55);
+    }
+
+    var visible = true;
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (es) { visible = es[0].isIntersecting; demo.classList.toggle('paused', !visible); }).observe(stage);
+    }
+    async function awake() { while (!visible || document.hidden) await wait(400); }
+    async function loop() {
+      for (var i = 0; ; i = (i + 1) % SCENES.length) {
+        await awake();
+        if (reduce.matches) { started = false; still(); return; }
+        await play(SCENES[i], i);
+      }
+    }
+
+    var started = false;
+    function begin() {
+      // The kitten's blink and tail are SMIL animations: stop them along with everything else.
+      stage.querySelectorAll('svg').forEach(function (el) { if (el.pauseAnimations) { if (reduce.matches) el.pauseAnimations(); else el.unpauseAnimations(); } });
+      if (reduce.matches) { still(); return; }
+      if (!started) { started = true; loop(); }
+    }
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(begin); else begin();
+    fitCase();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitCase);
+    window.addEventListener('resize', function () { fitCase(); if (reduce.matches) still(); });
+    if (reduce.addEventListener) reduce.addEventListener('change', begin);
+  }
+  document.querySelectorAll('.stage').forEach(scene);
+})();
+</script>
+</body>
+</html>

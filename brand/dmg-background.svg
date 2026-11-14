@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="440" viewBox="0 0 640 440">
+  <!-- DMG window background, 640×440 pt. Syncliko sits at (170, 190), Applications at (470, 190)
+       (positions in mac/dmg/settings.py); the arrow between them says "drag here". -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F7F8FB"/><stop offset="1" stop-color="#ECEFF6"/></linearGradient>
+  </defs>
+  <rect width="640" height="440" fill="url(#bg)"/>
+  <path d="M262 190H368" fill="none" stroke="#2D4DF2" stroke-width="4" stroke-linecap="round" stroke-dasharray="1 11"/>
+  <path d="M362 178L378 190L362 202" fill="none" stroke="#2D4DF2" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="320" y="300" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif" font-size="15" fill="#5D6070">Drag Syncliko to Applications to install it</text>
+</svg>

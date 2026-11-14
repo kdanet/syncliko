@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Syncliko mark: a geometric S of two half rings joined in the middle, one half per device.
+       Grid 100: centre line M66 22 H50 A14 14 0 0 0 50 50 A14 14 0 0 1 50 78 H34, stroke 13, butt caps;
+       the glyph spans 29.5..70.5 × 15.5..84.5 and is centred on (50, 50). On the cobalt tile the top half
+       is white and the bottom half mint; single-colour uses (menu bar, Android small icons) draw one path.
+       render.sh builds every PNG from this; the Android vectors and the Mac menu bar glyph reuse the numbers. -->
+  <path d="M66 22H50A14 14 0 0 0 50 50" fill="none" stroke="#FFFFFF" stroke-width="13"/>
+  <path d="M50 50A14 14 0 0 1 50 78H34" fill="none" stroke="#9BF5C8" stroke-width="13"/>
+</svg>

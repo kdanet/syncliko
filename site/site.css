@@ -38,6 +38,8 @@
 }
 
 * { box-sizing: border-box; }
+/* `hidden` must win over any display a component sets (the scene shows and hides parts with it). */
+[hidden] { display: none !important; }
 html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0;

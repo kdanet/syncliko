@@ -4,6 +4,20 @@ Each release on [GitHub Releases](https://github.com/kdanet/syncliko/releases) c
 `Syncliko.apk` (Android) and `SHA256SUMS`. `scripts/release.sh` takes the release notes from the matching section
 below.
 
+## 0.3.3 — 2026-11-15
+
+**Android**
+
+- The welcome and pairing screens were hard to read in the dark theme: their headings were black. They follow
+  the theme now.
+- The pairing screens use the Syncliko cobalt instead of the old violet, and the welcome screen shows the app
+  icon.
+- The pairing steps name the Mac menu item as it is now: Add Device.
+
+**Mac**
+
+- No changes; the version number moves with Android.
+
 ## 0.3.2 — 2026-11-14
 
 The first public release.

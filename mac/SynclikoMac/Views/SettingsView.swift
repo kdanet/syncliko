@@ -1,19 +1,9 @@
 import SwiftUI
 import SynclikoTransport
 
-struct SettingsView: View {
-    var body: some View {
-        TabView {
-            Tab("General", systemImage: "gearshape") { GeneralSettings() }
-            Tab("Devices", systemImage: "smartphone") { DevicesSettings() }
-            Tab("About", systemImage: "info.circle") { AboutSettings() }
-        }
-        .frame(width: 500, height: 420)
-    }
-}
-
 struct GeneralSettings: View {
     @Environment(AppModel.self) private var model
+    @AppStorage(AppDelegate.showInMenuBarKey) private var showInMenuBar = true
 
     var body: some View {
         @Bindable var model = model
@@ -25,6 +15,12 @@ struct GeneralSettings: View {
                     Text("Approve Syncliko in System Settings → General → Login Items.")
                         .font(.caption)
                         .foregroundStyle(.orange)
+                }
+                Toggle("Show in menu bar", isOn: $showInMenuBar)
+                if !showInMenuBar {
+                    Text("Syncliko keeps syncing in the background. To get back here, open Syncliko again from Applications or Spotlight.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
             } footer: {
                 Text("Everything you copy is synced, including passwords and codes.")
@@ -177,6 +173,7 @@ struct AboutSettings: View {
                 .frame(maxWidth: 320)
             Link("github.com/kdanet/syncliko", destination: URL(string: "https://github.com/kdanet/syncliko")!)
                 .font(.callout)
+                .focusEffectDisabled()
             Spacer()
         }
         .frame(maxWidth: .infinity)

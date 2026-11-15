@@ -3,7 +3,11 @@ import SwiftUI
 
 @main
 struct SynclikoApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) private var delegate
     @State private var model: AppModel
+    /// Settings → General → "Show in menu bar". Hidden, Syncliko keeps syncing; opening the app again
+    /// (Finder, Spotlight, Launchpad) brings up Settings instead (see AppDelegate).
+    @AppStorage(AppDelegate.showInMenuBarKey) private var showInMenuBar = true
 
     init() {
         #if DEBUG
@@ -13,37 +17,109 @@ struct SynclikoApp: App {
             DispatchQueue.main.async { Snapshot.run(preview) }
             return
         }
+        if UserDefaults.standard.bool(forKey: "SynclikoSettingsPreview") {
+            // Debug: the Settings window on made-up data, without the server or the Keychain.
+            let preview = Snapshot.makeModel()
+            _model = State(initialValue: preview)
+            WindowPresenter.shared.attach(preview)
+            DispatchQueue.main.async {
+                WindowPresenter.shared.showSettings()
+                WindowPresenter.shared.selectSettingsTab(UserDefaults.standard.integer(forKey: "SynclikoSettingsTab"))
+            }
+            return
+        }
         #endif
-        _model = State(initialValue: AppModel())
+        let model = AppModel()
+        _model = State(initialValue: model)
+        // Set up here rather than from the menu bar item, which may be hidden.
+        WindowPresenter.shared.attach(model)
+        DispatchQueue.main.async { model.showWelcomeIfNeeded() }
     }
 
     var body: some Scene {
-        MenuBarExtra {
+        MenuBarExtra(isInserted: $showInMenuBar) {
             MenuView()
                 .environment(model)
-                .onAppear { WindowPresenter.shared.attach(model) }
         } label: {
             MenuBarIcon(model: model)
-                .task {
-                    WindowPresenter.shared.attach(model)
-                    model.showWelcomeIfNeeded()
-                }
         }
         .menuBarExtraStyle(.window)
-
-        Settings {
-            SettingsView().environment(model)
-        }
     }
 }
 
-/// Hosts the pairing window. A menu-bar app has no main window, so pairing requests and the first-run
-/// welcome open this window directly — even when the popover is closed.
+/// With the menu bar icon hidden there is no other way in, so opening Syncliko again shows Settings,
+/// as does launching it by hand. A launch at login stays quiet.
+final class AppDelegate: NSObject, NSApplicationDelegate {
+    static let showInMenuBarKey = "showInMenuBar"
+    private var launchedAtLogin = false
+
+    func applicationWillFinishLaunching(_ notification: Notification) {
+        // The open-application event carries "launched as login item" when the system starts us at login.
+        let event = NSAppleEventManager.shared().currentAppleEvent
+        launchedAtLogin = event?.eventID == AEEventID(kAEOpenApplication)
+            && event?.paramDescriptor(forKeyword: AEKeyword(keyAEPropData))?.enumCodeValue == OSType(keyAELaunchedAsLogInItem)
+    }
+
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        #if DEBUG
+        if Snapshot.directory != nil { return }
+        #endif
+        let shown = UserDefaults.standard.object(forKey: Self.showInMenuBarKey) as? Bool ?? true
+        if !shown, !launchedAtLogin {
+            MainActor.assumeIsolated { WindowPresenter.shared.showSettings() }
+        }
+    }
+
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        MainActor.assumeIsolated { WindowPresenter.shared.showSettings() }
+        return false
+    }
+}
+
+/// Hosts the pairing and Settings windows. A menu-bar app has no main window, so pairing requests, the
+/// first-run welcome and Settings open their windows directly — even when the popover is closed or the
+/// menu bar icon is hidden. (SwiftUI's Settings scene can only be opened from a visible view.)
 @MainActor
 final class WindowPresenter {
     static let shared = WindowPresenter()
     private var window: NSWindow?
+    private var settingsWindow: NSWindow?
     private weak var model: AppModel?
+
+    /// Settings in the standard Mac form: General, Devices and About as toolbar tabs.
+    func showSettings() {
+        guard let model else { return }
+        if settingsWindow == nil {
+            let tabs = NSTabViewController()
+            tabs.tabStyle = .toolbar
+            func tab<V: View>(_ title: String.LocalizationValue, _ symbol: String, _ view: V) {
+                let host = NSHostingController(rootView: view.environment(model).frame(width: 500, height: 420))
+                host.title = String(localized: title)  // becomes the window title, as in System Settings
+                let item = NSTabViewItem(viewController: host)
+                item.label = host.title ?? ""
+                item.image = NSImage(systemSymbolName: symbol, accessibilityDescription: nil)
+                tabs.addTabViewItem(item)
+            }
+            tab("General", "gearshape", GeneralSettings())
+            tab("Devices", "smartphone", DevicesSettings())
+            tab("About", "info.circle", AboutSettings())
+            let window = NSWindow(contentViewController: tabs)
+            // Content runs under the toolbar, as in SwiftUI's own Settings window: the forms inset themselves once.
+            window.styleMask = [.titled, .closable, .fullSizeContentView]
+            window.toolbarStyle = .preference
+            window.isReleasedWhenClosed = false
+            window.center()
+            settingsWindow = window
+        }
+        NSApp.activate()
+        settingsWindow?.makeKeyAndOrderFront(nil)
+    }
+
+    #if DEBUG
+    func selectSettingsTab(_ index: Int) {
+        (settingsWindow?.contentViewController as? NSTabViewController)?.selectedTabViewItemIndex = index
+    }
+    #endif
 
     func attach(_ model: AppModel) {
         guard self.model == nil else { return }

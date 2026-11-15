@@ -6,7 +6,6 @@ import SynclikoProtocol
 /// a header with the on/off switch, the paired devices, recent clips, and menu-style actions.
 struct MenuView: View {
     @Environment(AppModel.self) private var model
-    @Environment(\.openSettings) private var openSettings
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -187,8 +186,9 @@ struct MenuView: View {
                 MenuActionRow(title: "Add Device…", systemImage: "plus") { showPairing() }
             }
             MenuActionRow(title: "Settings…", systemImage: "gearshape", shortcut: "⌘,") {
-                NSApp.activate()
-                openSettings()
+                // Close the menu first, so it doesn't hang over the Settings window.
+                NSApp.keyWindow?.close()
+                WindowPresenter.shared.showSettings()
             }
             .keyboardShortcut(",", modifiers: .command)
             MenuActionRow(title: "Quit Syncliko", systemImage: "power", shortcut: "⌘Q") { NSApp.terminate(nil) }

@@ -110,3 +110,5 @@
 "Couldn’t reach GitHub" = "Не удалось связаться с GitHub";
 "Up to date · checked %@" = "Последняя версия · проверено %@";
 "Not checked yet" = "Ещё не проверялось";
+"Show in menu bar" = "Показывать в строке меню";
+"Syncliko keeps syncing in the background. To get back here, open Syncliko again from Applications or Spotlight." = "Syncliko продолжит синхронизацию в фоне. Чтобы вернуться сюда, откройте Syncliko ещё раз из «Программ» или через Spotlight.";

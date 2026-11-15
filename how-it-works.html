@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>How Syncliko works</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="How Syncliko connects an Android phone and a Mac: QR pairing, TLS 1.3 with pinned certificates, Bonjour or Tailscale, and what one clip looks like on the wire.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f5f6f9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1016" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="icon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="canonical" href="https://kdanet.github.io/syncliko/how-it-works.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="How Syncliko works">
+<meta property="og:image" content="https://kdanet.github.io/syncliko/icon-512.png">
+<link rel="stylesheet" href="site.css?v=e4849cf">
+<style>
+/* The technical page: a title, prose beside a spec ledger, one decoded wire frame, and a way back. */
+.page-head { padding-block: clamp(28px, 6vw, 64px) clamp(8px, 2vw, 16px); }
+.page-head h1 { font: 800 clamp(2rem, 1.4rem + 2.6vw, 3.4rem)/1.06 var(--display); letter-spacing: -0.03em; margin: 0 0 18px; max-width: 18ch; text-wrap: balance; }
+.page-head .lede { font-size: var(--step-1); line-height: 1.5; color: var(--muted); max-width: 46ch; margin: 0; text-wrap: pretty; }
+.hood { padding-top: clamp(24px, 4vw, 48px); }
+.top nav a[aria-current="page"] { color: var(--ink); }
+/* How it works: prose and a spec ledger, then one decoded wire frame. */
+.hood .grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(28px, 5vw, 64px); align-items: start; margin-top: 8px; }
+@media (max-width: 920px) { .hood .grid { grid-template-columns: 1fr; } }
+.hood .frame { margin-top: 44px; background: var(--raised); }
+.frame { border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); overflow: hidden; min-width: 0; }
+.frame-head { padding: 12px 16px; border-bottom: 1px solid var(--line); font: 500 0.74rem/1 var(--mono); color: var(--muted); display: flex; justify-content: space-between; gap: 12px; }
+.frame-scroll { overflow-x: auto; }
+.frame table { border-collapse: collapse; width: 100%; font: 400 0.76rem/1.6 var(--mono); min-width: 520px; }
+.frame td { padding: 10px 16px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.frame tr:last-child td { border-bottom: 0; }
+.frame td:first-child { color: var(--accent); white-space: nowrap; width: 1%; }
+.frame td:nth-child(2) { color: var(--muted); white-space: nowrap; width: 1%; }
+.frame .json { color: var(--ink); overflow-wrap: anywhere; }
+
+.specs { margin: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); column-gap: 28px; }
+.specs dt, .specs dd { padding-block: 13px; border-top: 1px solid var(--line); margin: 0; }
+.specs dt { font: 600 0.74rem/1.6 var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.specs dd { font-variant-numeric: tabular-nums; }
+.specs code { font: 400 0.86em var(--mono); background: var(--code-bg); padding: 2px 6px; border-radius: 5px; }
+@media (max-width: 520px) { .specs { grid-template-columns: 1fr; } .specs dd { border-top: 0; padding-top: 0; } }
+.next { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 24px; margin-top: clamp(40px, 6vw, 72px); padding-top: 28px; border-top: 1px solid var(--line); }
+.next p { margin: 0; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="./"><svg class="brand-mark" viewBox="0 0 100 100" aria-hidden="true"><rect class="mark-tile" width="100" height="100" rx="22"/><g transform="translate(50 50) scale(0.8) translate(-50 -50)" fill="none" stroke-width="13"><path class="mark-a" d="M66 22H50A14 14 0 0 0 50 50"/><path class="mark-b" d="M50 50A14 14 0 0 1 50 78H34"/></g></svg>Syncliko</a>
+    <nav aria-label="Main">
+      <a href="./#modes">Modes</a>
+      <a href="how-it-works.html" aria-current="page">How it works</a>
+      <a href="./#faq">FAQ</a>
+      <a href="https://github.com/kdanet/syncliko" rel="noopener">GitHub</a>
+      <a class="nav-cta" href="./#install">Download</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="page-head">
+    <div class="wrap">
+      <p class="eyebrow">How it works</p>
+      <h1>Straight from one device to the other</h1>
+      <p class="lede">No cloud in between: the phone and the Mac find each other, check each other’s certificate and pass the clip directly.</p>
+    </div>
+  </div>
+
+  <section class="hood">
+    <div class="wrap">
+      <div class="grid">
+        <div class="prose">
+          <p>The phone and the Mac pair once with a QR code that carries the Mac’s certificate fingerprint and a one-time token. Both screens show the same 6-digit code, so you can confirm it’s really your Mac. From then on they talk only to each other over TLS 1.3, and each side checks the other’s certificate.</p>
+          <p>Over Tailscale, traffic may pass through Tailscale’s relays, still encrypted end to end between your devices.</p>
+          <p>Everything you copy is synced, passwords and 2FA codes included. Nothing is filtered or held back.</p>
+        </div>
+        <dl class="specs">
+          <dt>Encryption</dt><dd>TLS 1.3, mutual authentication, certificates pinned by SHA-256</dd>
+          <dt>Network</dt><dd>Same Wi-Fi via Bonjour <code>_syncliko._tcp</code> on port <code>47823</code>, or Tailscale by MagicDNS name or 100.x address</dd>
+          <dt>Latency</dt><dd>0.1–0.4 s from copy to the other clipboard on Wi-Fi, measured on a Galaxy Z Fold 8</dd>
+          <dt>Battery</dt><dd>The connection sleeps 30 s after the screen turns off and reconnects in about 0.2 s when it turns on. Anything you copied on the Mac in the last 2 minutes is waiting.</dd>
+          <dt>Data</dt><dd>Text, links and images (PNG, JPEG, HEIC) up to 20 MB, in 256 KB chunks</dd>
+          <dt>Servers</dt><dd>None. No accounts, no analytics.</dd>
+          <dt>Requires</dt><dd>Android 12+ (phones, tablets, foldables) and macOS 26+ on Apple silicon</dd>
+        </dl>
+      </div>
+
+      <div class="frame">
+        <div class="frame-head"><span>One protocol frame, byte by byte</span><span>clip · 0x10</span></div>
+        <div class="frame-scroll">
+          <table>
+            <caption class="sr-only">Fields of a clip frame</caption>
+            <tr><td>u8</td><td>type</td><td class="json">0x10 — clip</td></tr>
+            <tr><td>u32</td><td>header length</td><td class="json">259</td></tr>
+            <tr><td>u32</td><td>payload length</td><td class="json">18</td></tr>
+            <tr><td>json</td><td>header</td><td class="json">{"createdAt":1794587040000, "id":"6F96…64FF", "kind":"text", "mime":"text/plain;charset=utf-8", "origin":"android-3b1f…5e60", "sensitive":false, "sha256":"9c1e…41a4", "size":18}</td></tr>
+            <tr><td>bytes</td><td>payload</td><td class="json">table.io/r/8KX2-Q4</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="next">
+        <p>Free, no account. Android 12+ and macOS 26+ on Apple silicon.</p>
+        <a class="btn primary" href="./#install">Download Syncliko</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span class="foot-brand"><svg class="brand-mark" viewBox="0 0 100 100" aria-hidden="true"><rect class="mark-tile" width="100" height="100" rx="22"/><g transform="translate(50 50) scale(0.8) translate(-50 -50)" fill="none" stroke-width="13"><path class="mark-a" d="M66 22H50A14 14 0 0 0 50 50"/><path class="mark-b" d="M50 50A14 14 0 0 1 50 78H34"/></g></svg>Syncliko<span class="foot-ver">0.3.4</span></span>
+    <span>No analytics, no cookies, no servers. Your clipboard stays between your devices.</span>
+    <span class="foot-links"><a class="foot-link" href="./">Home</a><a class="foot-link" href="https://github.com/kdanet/syncliko" rel="noopener">GitHub</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

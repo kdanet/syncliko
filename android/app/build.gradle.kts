@@ -12,8 +12,8 @@ android {
         applicationId = "com.syncliko.android"
         minSdk = 31
         targetSdk = 37
-        versionCode = 10
-        versionName = "0.3.3"
+        versionCode = 11
+        versionName = "0.3.4"
     }
 
     // Release key, kept outside the repository. scripts/release.sh sets these from the macOS Keychain:

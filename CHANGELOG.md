@@ -4,6 +4,18 @@ Each release on [GitHub Releases](https://github.com/kdanet/syncliko/releases) c
 `Syncliko.apk` (Android) and `SHA256SUMS`. `scripts/release.sh` takes the release notes from the matching section
 below.
 
+## 0.3.4 — 2026-11-15
+
+**Mac**
+
+- The menu bar icon can be hidden: Settings → General → Show in menu bar. Syncliko keeps syncing in the
+  background; open it again from Applications or Spotlight to get back to Settings.
+- The Syncliko menu closes when you open Settings from it.
+
+**Android**
+
+- No changes; the version number moves with the Mac.
+
 ## 0.3.3 — 2026-11-15
 
 **Android**
